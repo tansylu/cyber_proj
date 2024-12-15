@@ -1,11 +1,24 @@
 <?php
-session_start();
+// Include database connection
+include 'database.php';
+
+// Initialize variables for error/success messages
+$error = '';
+$success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    // Collect and sanitize user input
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
 
-
+    // Input validation
+    if (empty($username) || empty($password)) {
+        $error = "Username and password cannot be empty.";
+    } elseif (strlen($password) < 6) {
+        $error = "Password must be at least 6 characters long.";
+    } else {
+        $success = "Account created succesfully";
+    }
 }
 ?>
 
@@ -20,13 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin: 20px;
         }
 
-        .login-container {
+        .create-account-container {
             max-width: 400px;
             margin: 50px auto;
             text-align: center;
         }
 
-        .login-form {
+        .create-account-form {
             background: #fff;
             padding: 20px;
             border-radius: 8px;
@@ -35,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             /* Add space below the form for the links */
         }
 
-        .login-form input {
+        .create-account-form input {
             width: calc(100% - 20px);
             padding: 10px;
             margin-bottom: 15px;
@@ -43,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 5px;
         }
 
-        .login-form button {
+        .create-account-form button {
             width: 100%;
             padding: 10px;
             background-color: blue;
@@ -54,50 +67,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             cursor: pointer;
         }
 
-        .login-form button:hover {
-            background-color: #007BFF;
-        }
-
-        .link-container {
-            margin-top: 10px;
-            /* Add some space above the links */
-        }
-
-        .link-container a {
-            display: inline-box;
-            text-decoration: none;
-            color: blue;
-            font-weight: bold;
-            margin-right: 10px;
-            margin-left: 10px;
-            margin-bottom: 5px;
-        }
-
-        .link-container a:hover {
-            color: darkblue;
+        .create-account-form button:hover {
+            background-color: darkblue;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="login-container">
+    <div class="create-account-container">
         <!-- Header -->
-        <h1>Sign in to your account</h1>
+        <h1>Create an account</h1>
         <!-- Login Form -->
-        <form method="POST" class="login-form">
+        <form method="POST" class="create-account-form">
             <input type="text" name="username" placeholder="Username" required>
             <input type="password" name="password" placeholder="Password" required>
-            <button type="submit">Login</button>
+            <button type="submit">Create</button>
         </form>
 
-        <!-- Links below the form -->
-        <div class="link-container">
-            <a href="admin_login.php">Admin Login</a>
-            <a href="create_account.php">Create Account</a>
-        </div>
     </div>
-
 </body>
 
 </html>
