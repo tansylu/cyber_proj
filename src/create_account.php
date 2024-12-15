@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (strlen($password) < 6) {
         $error = "Password must be at least 6 characters long.";
     } else {
-        $success = "Account created succesfully";
+        $success = "Account created succesfully!";
     }
 }
 ?>
@@ -78,7 +78,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="create-account-container">
         <!-- Header -->
         <h1>Create an account</h1>
-        <!-- Login Form -->
+
+        <!-- Display success or error messages -->
+        <?php if (!empty($error)): ?>
+            <p class="message error"><?php echo $error; ?></p>
+        <?php endif; ?>
+
+        <?php if (!empty($success)): ?>
+            <p class="message success"><?php echo $success; ?></p>
+        <?php endif; ?>
+
+        <!-- Create Account Form -->
         <form method="POST" class="create-account-form">
             <input type="text" name="username" placeholder="Username" required>
             <input type="password" name="password" placeholder="Password" required>
