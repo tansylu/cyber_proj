@@ -1,3 +1,4 @@
+version: "3" # Specify a supported version of Docker Compose
 services:
   web:
     build:
@@ -5,24 +6,9 @@ services:
       dockerfile: docker/Dockerfile
     ports:
       - "8080:80" # HTTP port for the web service
-    develop:
-      watch:
-        - action: sync # Sync changes to source code into the container
-          path: ./src
-          target: /var/www/html
-          ignore:
-            - .git/
-            - "*.tmp"
-        - action: sync # Sync changes to the uploads directory
-          path: ./uploads
-          target: /var/www/uploads
-          ignore:
-            - .git/
-            - "*.tmp"
-        - action: rebuild # Rebuild the service if Dockerfile changes
-          path: ./docker/Dockerfile
-        - action: rebuild # Rebuild the service if dependencies change
-          path: ./docker-compose.yaml
+    volumes:
+      - ./src:/var/www/html
+      - ./uploads:/var/www/uploads
     depends_on:
       - db
 
@@ -35,7 +21,8 @@ services:
     ports:
       - "3306:3306" # MySQL port for database access
     volumes:
+      - db_data:/var/lib/mysql
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
-  db_data:
+  db_data: # This is now defined correctly

@@ -1,6 +1,17 @@
 <?php
-// Include any server-side logic here
+// RSS feed URL'sini tanımla
+$rss_url = "https://www.ntv.com.tr/seyahat.rss";
+
+// RSS feed'i yükle
+$rss = simplexml_load_file($rss_url);
+
+// Hata kontrolü
+if ($rss === false) {
+    echo "RSS Feed yüklenemedi.";
+    exit;
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -68,6 +79,42 @@
             color: #555;
             line-height: 1.6;
         }
+
+        .news-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .news-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            width: 300px;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        .news-item h3 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            color: #007BFF;
+        }
+
+        .news-item p {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        .news-item a {
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -91,7 +138,25 @@
     <!-- Dashboard Content Section -->
     <div class="dashboard-content">
         <h2>Latest Travel News</h2>
-        <p>Stay informed about the latest travel advisories and updates.</p>
+        <div class="news-container">
+            <?php
+            // Atom formatındaki 'entry' etiketlerini işle
+            foreach ($rss->entry as $item) {
+                $title = $item->title; // Haber başlığı
+                $link = $item->link['href']; // Haber bağlantısı
+                $content = strip_tags($item->content); // İçerik (HTML temizlenmiş)
+                $published = date("d-m-Y H:i", strtotime($item->published)); // Yayınlanma tarihi
+
+                // Haber kutusunu ekrana yazdır
+                echo '<div class="news-item">';
+                echo '<h3>' . htmlspecialchars($title) . '</h3>';
+                echo '<p><strong>Published:</strong> ' . $published . '</p>';
+                echo '<p>' . htmlspecialchars(mb_substr($content, 0, 150)) . '...</p>';
+                echo '<a href="' . htmlspecialchars($link) . '" target="_blank">Read more</a>';
+                echo '</div>';
+            }
+            ?>
+        </div>
     </div>
 </body>
 
