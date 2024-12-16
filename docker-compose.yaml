@@ -7,11 +7,9 @@ services:
       dockerfile: docker/Dockerfile
     ports:
       - "8080:80"
-    environment:
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_HOST: ${DB_SERVERNAME}
+    volumes:
+      - ./src:/var/www/html
+      - ./uploads:/var/www/uploads
     depends_on:
       - db
 

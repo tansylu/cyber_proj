@@ -15,26 +15,19 @@ RUN a2enmod rewrite
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Set working directory
-WORKDIR /var/www/html/
+WORKDIR /var/www/
 
 # Copy composer.json and composer.lock before source files to leverage Docker cache
-COPY composer.json composer.lock /var/www/html/
+COPY composer.json composer.lock /var/www/
 
 # Install PHP dependencies using Composer
 RUN composer install --optimize-autoloader --no-dev
 
 # Copy application files into the container
-COPY src/ /var/www/html/
-COPY uploads/ /var/www/uploads/
-COPY .env /var/www/html/.env 
+COPY .env /var/www/
 
 # List the files to verify installation (optional, remove in production)
-RUN ls -la /var/www/html/
-RUN cat /var/www/html/.env
-
-# Set proper permissions (avoid 777, set user/group to www-data for security)
-RUN chown -R www-data:www-data /var/www/html /var/www/uploads
-RUN chmod -R 755 /var/www/html /var/www/uploads
+RUN cat /var/www/.env
 
 # Expose the default Apache port
 EXPOSE 80
