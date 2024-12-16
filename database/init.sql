@@ -2,11 +2,15 @@ CREATE DATABASE IF NOT EXISTS travel_advisory;
 
 USE travel_advisory;
 
+
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    profile_pic VARCHAR(255) DEFAULT NULL,
+    age INT DEFAULT NULL,
+    gender ENUM('male', 'female', 'other') DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS rss_items (

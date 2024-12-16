@@ -10,6 +10,12 @@ services:
     volumes:
       - ./src:/var/www/html
       - ./uploads:/var/www/uploads
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      
     depends_on:
       - db
 
