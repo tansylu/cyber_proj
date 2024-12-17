@@ -1,15 +1,19 @@
-CREATE DATABASE travel_advisory;
+CREATE DATABASE IF NOT EXISTS travel_advisory;
 
 USE travel_advisory;
 
-CREATE TABLE users (
+
+CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    profile_pic VARCHAR(255) DEFAULT NULL,
+    age INT DEFAULT NULL,
+    gender ENUM('male', 'female', 'other') DEFAULT NULL
 );
 
-CREATE TABLE rss_items (
+CREATE TABLE IF NOT EXISTS rss_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     link TEXT NOT NULL,
@@ -18,10 +22,15 @@ CREATE TABLE rss_items (
     UNIQUE (title)
 );
 
-CREATE TABLE comments (
+CREATE TABLE IF NOT EXISTS comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     comment TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+-- Create user and grant privileges
+CREATE USER IF NOT EXISTS '${DB_USERNAME}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
+GRANT ALL PRIVILEGES ON travel_advisory.* TO '${DB_USERNAME}'@'%';
+FLUSH PRIVILEGES;

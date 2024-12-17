@@ -1,5 +1,37 @@
 <?php
-// File upload handling
+session_start();
+require($_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php');
+$dotenv = Dotenv\Dotenv::createImmutable($_SERVER['DOCUMENT_ROOT'] . '/../');
+$dotenv->load();
+
+// Check if the user is logged in, if not, redirect to login page
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Database connection (use environment variables)
+$servername = $_SERVER['DB_SERVERNAME'] ?? 'default_servername';
+$username = $_SERVER['DB_USERNAME'] ?? 'default_username';
+$password = $_SERVER['DB_PASSWORD'] ?? 'default_password';
+$dbname = $_SERVER['DB_NAME'] ?? 'default_dbname';
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch user information from the database using session data (user_id)
+$stmt = $conn->prepare("SELECT username, age, gender, profile_pic FROM users WHERE id = ?");
+$stmt->bind_param("i", $_SESSION['user_id']);
+$stmt->execute();
+$stmt->store_result();
+$stmt->bind_result($db_username, $db_age, $db_gender, $db_profile_pic);
+$stmt->fetch();
+$stmt->close();
+
+// Handle profile picture upload
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_pic'])) {
     $uploadDir = 'uploads/'; // Directory for uploaded files
     $uploadFile = $uploadDir . basename($_FILES['profile_pic']['name']);
@@ -17,12 +49,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_pic'])) {
     } elseif ($_FILES['profile_pic']['size'] > 2 * 1024 * 1024) { // Limit file size to 2MB
         echo "<p style='color:red;'>Error: File size exceeds 2MB limit.</p>";
     } elseif (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $uploadFile)) {
+        // Save the uploaded file path in the session and update the database
+        $_SESSION['profile_pic'] = $uploadFile;
+        $stmt = $conn->prepare("UPDATE users SET profile_pic = ? WHERE id = ?");
+        $stmt->bind_param("si", $uploadFile, $_SESSION['user_id']);
+        $stmt->execute();
+        $stmt->close();
         echo "<p style='color:green;'>File uploaded successfully!</p>";
-        echo "<img src='/uploads/" . htmlspecialchars(basename($_FILES['profile_pic']['name'])) . "' alt='Profile Picture' style='max-width:200px; margin-top:10px;'>";
     } else {
         echo "<p style='color:red;'>Error: File upload failed. Please try again.</p>";
     }
 }
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -119,12 +158,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_pic'])) {
         .upload-form button:hover {
             background-color: darkblue;
         }
+
+        .error {
+            color: red;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 
 <body>
     <div class="header">
-        <h1>Profile</h1>
+        <h1>Your Profile</h1>
     </div>
 
     <div class="nav-container">
@@ -137,13 +181,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_pic'])) {
         </ul>
     </div>
 
-    <!-- Profile Picture Upload Form -->
-    <div class="upload-form">
-        <form method="POST" enctype="multipart/form-data">
-            <input type="file" name="profile_pic" accept="image/*" required>
-            <button type="submit">Upload</button>
-        </form>
+    <div class="profile-container">
+        <div class="profile-info">
+            <h2>Welcome, <?php echo htmlspecialchars($db_username); ?></h2>
+            <p>Age: <?php echo htmlspecialchars($db_age); ?></p>
+            <p>Gender: <?php echo htmlspecialchars($db_gender); ?></p>
+            <?php
+            if (isset($_SESSION['profile_pic'])) {
+                echo "<h3>Your Profile Picture:</h3>";
+                echo "<img src='" . $_SESSION['profile_pic'] . "' alt='Profile Picture' style='max-width:200px; margin-top:10px;'>";
+            } else {
+                echo "<h3>No profile picture uploaded.</h3>";
+            }
+            ?>
+        </div>
+
+        <!-- Profile Picture Upload Form -->
+        <div class="upload-form">
+            <form method="POST" enctype="multipart/form-data">
+                <input type="file" name="profile_pic" accept="image/*" required>
+                <button type="submit">Upload New Picture</button>
+            </form>
+        </div>
     </div>
+
 </body>
 
 </html>
