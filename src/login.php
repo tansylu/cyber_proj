@@ -1,12 +1,49 @@
 <?php
 session_start();
+require($_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php');
+$dotenv = Dotenv\Dotenv::createImmutable($_SERVER['DOCUMENT_ROOT'] . '/../');
+$dotenv->load();
+
+$servername = $_SERVER['DB_SERVERNAME'] ?? 'default_servername';
+$username = $_SERVER['DB_USERNAME'] ?? 'default_username';
+$password = $_SERVER['DB_PASSWORD'] ?? 'default_password';
+$dbname = $_SERVER['DB_NAME'] ?? 'default_dbname';
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
+    $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->store_result();
 
+    if ($stmt->num_rows > 0) {
+        $stmt->bind_result($id, $db_username, $db_password);
+        $stmt->fetch();
+
+        if (password_verify($password, $db_password)) {
+            $_SESSION['user_id'] = $id;
+            $_SESSION['username'] = $db_username;
+            header("Location: profile.php");
+            exit();
+        } else {
+            $error = "Invalid username or password.";
+        }
+    } else {
+        $error = "Invalid username or password.";
+    }
+
+    $stmt->close();
 }
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -32,7 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             margin-bottom: 15px;
-            /* Add space below the form for the links */
         }
 
         .login-form input {
@@ -60,7 +96,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .link-container {
             margin-top: 10px;
-            /* Add some space above the links */
         }
 
         .link-container a {
@@ -76,22 +111,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .link-container a:hover {
             color: darkblue;
         }
+
+        .error {
+            color: red;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="login-container">
-        <!-- Header -->
         <h1>Sign in to your account</h1>
-        <!-- Login Form -->
+        <?php if (isset($error)): ?>
+            <div class="error"><?php echo $error; ?></div>
+        <?php endif; ?>
         <form method="POST" class="login-form">
             <input type="text" name="username" placeholder="Username" required>
             <input type="password" name="password" placeholder="Password" required>
             <button type="submit">Login</button>
         </form>
-
-        <!-- Links below the form -->
         <div class="link-container">
             <a href="admin_login.php">Admin Login</a>
             <a href="create_account.php">Create Account</a>
