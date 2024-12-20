@@ -30,6 +30,16 @@ CREATE TABLE IF NOT EXISTS comments (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+CREATE TABLE IF NOT EXISTS article_comments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    news_link TEXT NOT NULL,         -- Haber linki
+    user_id INT NOT NULL,            -- Kullanıcı ID'si
+    comment TEXT NOT NULL,           -- Yorum içeriği
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
 -- Create user and grant privileges
 CREATE USER IF NOT EXISTS '${DB_USERNAME}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
 GRANT ALL PRIVILEGES ON travel_advisory.* TO '${DB_USERNAME}'@'%';
