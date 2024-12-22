@@ -12,14 +12,6 @@ if ($rss === false) {
     exit;
 }
 
-/*
-// Handle the POST request when the "Read more" button is clicked
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
-    $news_link = $_POST['news_link'];
-    $response = file_get_contents($news_link);
-    echo $response;
-}
-*/
 ?>
 
 <!DOCTYPE html>
@@ -154,48 +146,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
             foreach ($rss->entry as $item) {
                 $title = $item->title; // // Haber başlığı
                 $link = $item->link['href']? (string)$item->link['href'] : (string)$item->id; // Haber bağlantısı
-                $content = strip_tags($item->content); // İçerik (HTML temizlenmiş)
+                $description = strip_tags($item->content); // İçerik (HTML temizlenmiş)
                 $published = date("d-m-Y H:i", strtotime($item->published)); // Yayınlanma tarihi
+
+                
             
-                // Haber kutusunu ekrana yazdır
                 echo '<div class="news-item">';
                 echo '<h3>' . htmlspecialchars($title) . '</h3>';
                 echo '<p><strong>Published:</strong> ' . $published . '</p>';
-                echo '<p>' . htmlspecialchars(mb_substr($content, 0, 150)) . '...</p>';
-                /*
-                echo '<form method="POST" action="">';
-                echo '<input type="hidden" name="news_link" value="' . htmlspecialchars($link) . '">';
-                echo '<button type="submit" style="background: none; border: none; color: #007BFF; cursor: pointer; padding: 0; font-size: 1em;">Read more</button>';
-                */
+                echo '<p>' . htmlspecialchars(mb_substr($description, 0, 150)) . '...</p>';
                 echo '<a href="' . htmlspecialchars($link) . '" target="_blank">Read More</a>';
-                
-
-                // Haberle ilişkili yorumları çek ve göster
-                $comments_stmt = $conn->prepare("SELECT users.username, article_comments.comment 
-                                                FROM article_comments 
-                                                JOIN users ON article_comments.user_id = users.id 
-                                                WHERE article_comments.news_link = ?");
-                if ($comments_stmt === false) {
-                    die("SQL Error: " . $conn->error);
-                }                                
-                $comments_stmt->bind_param("s", $link);
-                $comments_stmt->execute();
-                $comments_result = $comments_stmt->get_result();
-
-                echo '<h4>Comments:</h4>';
-                while ($comment_row = $comments_result->fetch_assoc()) {
-                    echo '<p><strong>' . htmlspecialchars($comment_row['username']) . ':</strong> ' . htmlspecialchars($comment_row['comment']) . '</p>';
-                }
-
-                // Yorum formu
-                echo '<form method="POST" action="articlecomments.php">';
+                echo '<form method="GET" action="viewarticle.php" style="margin-top: 10px;">';
                 echo '<input type="hidden" name="news_link" value="' . htmlspecialchars($link) . '">';
-                echo '<textarea name="comment" placeholder="Write your comment..." required></textarea>';
-                echo '<button type="submit">Post Comment</button>';
+                echo '<a href="viewarticle.php?news_link=' . urlencode($link) . '">Comments</a>';
                 echo '</form>';
-                echo '</div>';
-
+                echo '</div>'; 
             }
+                
+            
             ?>
         </div>
     </div>
