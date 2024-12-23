@@ -164,6 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
                 echo '<input type="hidden" name="news_link" value="' . htmlspecialchars($link) . '">';
                 echo '<button type="submit" style="background: none; border: none; color: #007BFF; cursor: pointer; padding: 0; font-size: 1em;">Read more</button>';
                 echo '</form>';
+                echo '<a href="viewarticle.php?news_link=' . urlencode($link) . '">Comments</a>';
                 echo '</div>';
             }
             ?>
