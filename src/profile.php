@@ -171,13 +171,13 @@ $conn->close();
         <h1>Your Profile</h1>
     </div>
 
+    <!-- Navigation Menu -->
     <div class="nav-container">
         <ul>
             <li><a href="index.php">Dashboard</a></li>
-            <li><a href="search.php">Search Travel Advisories</a></li>
-            <li><a href="comment.php">Post Comments</a></li>
-            <li><a href="login.php">Login</a></li>
+            <li><a href="search.php">Search Travel News</a></li>
             <li><a href="profile.php">Profile</a></li>
+            <li><a href="logout.php" style="color: red;">Logout</a></li>
         </ul>
     </div>
 
