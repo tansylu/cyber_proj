@@ -2,6 +2,30 @@
 session_start();
 include 'database.php';
 
+// Handle Comment Submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id']) && isset($_POST['comment'])) {
+    $user_id = $_SESSION['user_id'];
+    $news_link = $_POST['news_link'];
+    $comment = trim($_POST['comment']);
+
+    if (!empty($comment)) {
+        // Prepare and execute the insert query
+        $insert_stmt = $conn->prepare("INSERT INTO article_comments (user_id, news_link, comment, created_at) VALUES (?, ?, ?, NOW())");
+        if ($insert_stmt === false) {
+            die("SQL Error: " . $conn->error);
+        }
+
+        $insert_stmt->bind_param("iss", $user_id, $news_link, $comment);
+        if ($insert_stmt->execute()) {
+            $insert_stmt->close();
+            header("Location: viewarticle.php" . $_SERVER['REQUEST_URI']);
+            exit();
+        } else {
+            $insert_stmt->close();
+            die("Failed to post comment: " . $insert_stmt->error);
+        }
+    }
+}
 
 // Get the article's news_link from the URL
 if (!isset($_GET['news_link'])) {
@@ -35,6 +59,7 @@ $comments_result = $comments_stmt->get_result();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -95,29 +120,40 @@ $comments_result = $comments_stmt->get_result();
         }
     </style>
 </head>
+
 <body>
     <div class="container">
+        <!-- Display Article -->
         <div class="article">
             <h2><?php echo htmlspecialchars($article['title']); ?></h2>
             <p><strong>Published:</strong> <?php echo date("d-m-Y H:i", strtotime($article['pubDate'])); ?></p>
             <p><?php echo htmlspecialchars($article['description']); ?></p>
         </div>
 
+        <!-- Display Comments -->
         <div class="comments">
             <h3>Comments</h3>
             <?php while ($comment = $comments_result->fetch_assoc()): ?>
-                <p><strong><?php echo htmlspecialchars($comment['username']); ?>:</strong> <?php echo htmlspecialchars($comment['comment']); ?></p>
+                <p><strong><?php echo htmlspecialchars($comment['username']); ?>:</strong>
+                    <?php echo htmlspecialchars($comment['comment']); ?></p>
             <?php endwhile; ?>
         </div>
 
+        <!-- Comment Form (Logged-in Users Only) -->
         <div class="comment-form">
-            <h3>Add a Comment</h3>
-            <form method="POST" action="articlecomments.php">
-                <input type="hidden" name="news_link" value="<?php echo htmlspecialchars($news_link); ?>">
-                <textarea name="comment" placeholder="Write your comment..." required></textarea>
-                <button type="submit">Post Comment</button>
-            </form>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <form method="POST" action="">
+                    <h3>Add a Comment</h3>
+                    <input type="hidden" name="news_link" value="<?php echo htmlspecialchars($news_link); ?>">
+                    <textarea name="comment" placeholder="Write your comment..." required></textarea>
+                    <button type="submit">Post Comment</button>
+                </form>
+            <?php else: ?>
+                <!-- Display log in prompt if not logged in -->
+                <p><strong>You have to <a href="login.php">log in</a> before you can comment.</strong></p>
+            <?php endif; ?>
         </div>
     </div>
 </body>
+
 </html>
