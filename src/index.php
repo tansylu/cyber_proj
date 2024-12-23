@@ -12,6 +12,13 @@ if ($rss === false) {
     exit;
 }
 
+// Handle the POST request when the "Read more" button is clicked
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
+    $news_link = $_POST['news_link'];
+    $response = file_get_contents($news_link);
+    echo $response;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -145,25 +152,22 @@ if ($rss === false) {
             // Atom formatındaki 'entry' etiketlerini işle
             foreach ($rss->entry as $item) {
                 $title = $item->title; // // Haber başlığı
-                $link = $item->link['href']? (string)$item->link['href'] : (string)$item->id; // Haber bağlantısı
-                $description = strip_tags($item->content); // İçerik (HTML temizlenmiş)
+                $link = $item->link['href']; // Haber bağlantısı
+                $content = strip_tags($item->content); // İçerik (HTML temizlenmiş)
                 $published = date("d-m-Y H:i", strtotime($item->published)); // Yayınlanma tarihi
-
-                
             
+                // Haber kutusunu ekrana yazdır
                 echo '<div class="news-item">';
                 echo '<h3>' . htmlspecialchars($title) . '</h3>';
                 echo '<p><strong>Published:</strong> ' . $published . '</p>';
-                echo '<p>' . htmlspecialchars(mb_substr($description, 0, 150)) . '...</p>';
-                echo '<a href="' . htmlspecialchars($link) . '" target="_blank">Read More</a>';
-                echo '<form method="GET" action="viewarticle.php" style="margin-top: 10px;">';
+                echo '<p>' . htmlspecialchars(mb_substr($content, 0, 150)) . '...</p>';
+                echo '<form method="POST" action="">';
                 echo '<input type="hidden" name="news_link" value="' . htmlspecialchars($link) . '">';
-                echo '<a href="viewarticle.php?news_link=' . urlencode($link) . '">Comments</a>';
+                echo '<button type="submit" style="background: none; border: none; color: #007BFF; cursor: pointer; padding: 0; font-size: 1em;">Read more</button>';
                 echo '</form>';
-                echo '</div>'; 
+                echo '<a href="viewarticle.php?news_link=' . urlencode($link) . '">Comments</a>';
+                echo '</div>';
             }
-                
-            
             ?>
         </div>
     </div>
