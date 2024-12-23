@@ -1,4 +1,5 @@
 <?php
+include 'database.php'; 
 // RSS feed URL'sini tanımla
 $rss_url = "https://www.ntv.com.tr/seyahat.rss";
 
@@ -7,9 +8,10 @@ $rss = simplexml_load_file($rss_url);
 
 // Hata kontrolü
 if ($rss === false) {
-    echo "RSS Feed yüklenemedi.";
+    echo "A valid RSS XML response could not be retrieved.";
     exit;
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -128,7 +130,7 @@ if ($rss === false) {
     <div class="nav-container">
         <ul>
             <li><a href="index.php">Dashboard</a></li>
-            <li><a href="search.php">Search Travel Advisories</a></li>
+            <li><a href="search.php">Search Travel News</a></li>
             <li><a href="comment.php">Post Comments</a></li>
             <li><a href="login.php">Login</a></li>
             <li><a href="profile.php">Profile</a></li>
@@ -142,19 +144,26 @@ if ($rss === false) {
             <?php
             // Atom formatındaki 'entry' etiketlerini işle
             foreach ($rss->entry as $item) {
-                $title = $item->title; // Haber başlığı
-                $link = $item->link['href']; // Haber bağlantısı
-                $content = strip_tags($item->content); // İçerik (HTML temizlenmiş)
+                $title = $item->title; // // Haber başlığı
+                $link = $item->link['href']? (string)$item->link['href'] : (string)$item->id; // Haber bağlantısı
+                $description = strip_tags($item->content); // İçerik (HTML temizlenmiş)
                 $published = date("d-m-Y H:i", strtotime($item->published)); // Yayınlanma tarihi
 
-                // Haber kutusunu ekrana yazdır
+                
+            
                 echo '<div class="news-item">';
                 echo '<h3>' . htmlspecialchars($title) . '</h3>';
                 echo '<p><strong>Published:</strong> ' . $published . '</p>';
-                echo '<p>' . htmlspecialchars(mb_substr($content, 0, 150)) . '...</p>';
-                echo '<a href="' . htmlspecialchars($link) . '" target="_blank">Read more</a>';
-                echo '</div>';
+                echo '<p>' . htmlspecialchars(mb_substr($description, 0, 150)) . '...</p>';
+                echo '<a href="' . htmlspecialchars($link) . '" target="_blank">Read More</a>';
+                echo '<form method="GET" action="viewarticle.php" style="margin-top: 10px;">';
+                echo '<input type="hidden" name="news_link" value="' . htmlspecialchars($link) . '">';
+                echo '<a href="viewarticle.php?news_link=' . urlencode($link) . '">Comments</a>';
+                echo '</form>';
+                echo '</div>'; 
             }
+                
+            
             ?>
         </div>
     </div>
