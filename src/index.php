@@ -1,5 +1,9 @@
 <?php
-include 'database.php'; 
+session_start();
+
+// Check if user is logged in
+$isLoggedIn = isset($_SESSION['user_id']);
+
 // RSS feed URL'sini tanımla
 $rss_url = "https://www.ntv.com.tr/seyahat.rss";
 
@@ -11,6 +15,7 @@ if ($rss === false) {
     echo "A valid RSS XML response could not be retrieved.";
     exit;
 }
+
 
 // Handle the POST request when the "Read more" button is clicked
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
@@ -138,9 +143,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
         <ul>
             <li><a href="index.php">Dashboard</a></li>
             <li><a href="search.php">Search Travel News</a></li>
-            <li><a href="comment.php">Post Comments</a></li>
-            <li><a href="login.php">Login</a></li>
-            <li><a href="profile.php">Profile</a></li>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <li><a href="profile.php">Profile</a></li>
+                <li class="greeting">Hello, <?php echo htmlspecialchars($_SESSION['username']); ?>! </li>
+            <?php else: ?>
+                <li><a href="login.php">Login</a></li>
+            <?php endif; ?>
         </ul>
     </div>
 

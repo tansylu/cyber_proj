@@ -103,10 +103,13 @@ session_start();
     <div class="nav-container">
         <ul>
             <li><a href="index.php">Dashboard</a></li>
-            <li><a href="search.php">Search Travel Advisories</a></li>
-            <li><a href="comment.php">Post Comments</a></li>
-            <li><a href="login.php">Login</a></li>
-            <li><a href="profile.php">Profile</a></li>
+            <li><a href="search.php">Search Travel News</a></li>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <li><a href="profile.php">Profile</a></li>
+                <li class="greeting">Hello, <?php echo htmlspecialchars($_SESSION['username']); ?>! </li>
+            <?php else: ?>
+                <li><a href="login.php">Login</a></li>
+            <?php endif; ?>
         </ul>
     </div>
 
