@@ -16,10 +16,40 @@ if ($rss === false) {
     exit;
 }
 
+/*
+VULNERABILITY:
+This blacklist only prevents a certain hostname to be used in the URL while allowing all other hostnames/IP addresses. This leads to a potential SSRF
+with a blacklist-based input filter vulnerability.
+*/
+$blacklist = ['localhost'];
+
+// Function to check if a URL is in the blacklist
+function isUrlBlocked($url, $blacklist)
+{
+    $parsedUrl = parse_url($url);
+    if (!$parsedUrl || !isset($parsedUrl['host'])) {
+        return true; // Block invalid URLs
+    }
+    $host = $parsedUrl['host'];
+
+    // Simple host-based blacklist check (intentionally weak for demonstration)
+    if (in_array($host, $blacklist)) {
+        return true;
+    }
+
+    return false;
+}
 
 // Handle the POST request when the "Read more" button is clicked
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
     $news_link = $_POST['news_link'];
+
+    // Validate the URL against the blacklist
+    if (isUrlBlocked($news_link, $blacklist)) {
+        echo "Access to this URL is blocked for security reasons.";
+        exit;
+    }
+
     $response = file_get_contents($news_link);
     echo $response;
 }
