@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 require($_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php');
 $dotenv = Dotenv\Dotenv::createImmutable($_SERVER['DOCUMENT_ROOT'] . '/../');
 $dotenv->load();
@@ -22,6 +23,16 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+
+
+include 'database.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
 // Fetch user information from the database using session data (user_id)
 $stmt = $conn->prepare("SELECT username, age, gender, profile_pic FROM users WHERE id = ?");
 $stmt->bind_param("i", $_SESSION['user_id']);
@@ -38,26 +49,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_pic'])) {
     $fileType = strtolower(pathinfo($uploadFile, PATHINFO_EXTENSION)); // Get file extension
     $allowedTypes = ['jpg', 'jpeg', 'png', 'gif']; // Allowed file types
 
-    // Check if upload directory exists, if not, create it
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0777, true); // Create directory with permissions
+    if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true)) {
+        die("Failed to create directory: " . error_get_last()['message']);
     }
+    
+    
+    
 
     // File validation
     if (!in_array($fileType, $allowedTypes)) {
         echo "<p style='color:red;'>Error: Only JPG, JPEG, PNG, and GIF files are allowed.</p>";
     } elseif ($_FILES['profile_pic']['size'] > 2 * 1024 * 1024) { // Limit file size to 2MB
         echo "<p style='color:red;'>Error: File size exceeds 2MB limit.</p>";
-    } elseif (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $uploadFile)) {
-        // Save the uploaded file path in the session and update the database
-        $_SESSION['profile_pic'] = $uploadFile;
-        $stmt = $conn->prepare("UPDATE users SET profile_pic = ? WHERE id = ?");
-        $stmt->bind_param("si", $uploadFile, $_SESSION['user_id']);
-        $stmt->execute();
-        $stmt->close();
-        echo "<p style='color:green;'>File uploaded successfully!</p>";
     } else {
-        echo "<p style='color:red;'>Error: File upload failed. Please try again.</p>";
+        // Rename the file to avoid overwrites
+        $uniqueName = $uploadDir . uniqid('profile_', true) . '.' . $fileType;
+
+        if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $uniqueName)) {
+            // Update the database with the new file path
+            $stmt = $conn->prepare("UPDATE users SET profile_pic = ? WHERE id = ?");
+            $stmt->bind_param("si", $uniqueName, $user_id);
+            if ($stmt->execute()) {
+                echo "<p style='color:green;'>Profile picture uploaded successfully!</p>";
+                $db_profile_pic = $uniqueName; // Update for immediate display
+            } else {
+                echo "<p style='color:red;'>Error updating profile picture in the database.</p>";
+            }
+            $stmt->close();
+        } else {
+            echo "<p style='color:red;'>Error: File upload failed. Please try again.</p>";
+        }
     }
 }
 
@@ -171,13 +192,13 @@ $conn->close();
         <h1>Your Profile</h1>
     </div>
 
+    <!-- Navigation Menu -->
     <div class="nav-container">
         <ul>
             <li><a href="index.php">Dashboard</a></li>
-            <li><a href="search.php">Search Travel Advisories</a></li>
-            <li><a href="comment.php">Post Comments</a></li>
-            <li><a href="login.php">Login</a></li>
+            <li><a href="search.php">Search Travel News</a></li>
             <li><a href="profile.php">Profile</a></li>
+            <li><a href="logout.php" style="color: red;">Logout</a></li>
         </ul>
     </div>
 
@@ -185,15 +206,13 @@ $conn->close();
         <div class="profile-info">
             <h2>Welcome, <?php echo htmlspecialchars($db_username); ?></h2>
             <p>Age: <?php echo htmlspecialchars($db_age); ?></p>
-            <p>Gender: <?php echo htmlspecialchars($db_gender); ?></p>
-            <?php
-            if (isset($_SESSION['profile_pic'])) {
-                echo "<h3>Your Profile Picture:</h3>";
-                echo "<img src='" . $_SESSION['profile_pic'] . "' alt='Profile Picture' style='max-width:200px; margin-top:10px;'>";
-            } else {
-                echo "<h3>No profile picture uploaded.</h3>";
-            }
-            ?>
+            <p>Gender: <?php echo htmlspecialchars($db_gender); ?></p>           
+            <?php if (!empty($db_profile_pic)): ?>
+                <h3>Your Profile Picture:</h3>
+                <img src="<?php echo htmlspecialchars($db_profile_pic); ?>" alt="Profile Picture" style="max-width:200px; margin-top:10px;">
+            <?php else: ?>
+                <h3>No profile picture uploaded.</h3>
+            <?php endif; ?>
         </div>
 
         <!-- Profile Picture Upload Form -->
