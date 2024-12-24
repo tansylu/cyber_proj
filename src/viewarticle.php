@@ -2,6 +2,30 @@
 session_start();
 include 'database.php';
 
+// Handle Comment Submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id']) && isset($_POST['comment'])) {
+    $user_id = $_SESSION['user_id'];
+    $news_link = $_POST['news_link'];
+    $comment = trim($_POST['comment']);
+
+    if (!empty($comment)) {
+        // Prepare and execute the insert query
+        $insert_stmt = $conn->prepare("INSERT INTO article_comments (user_id, news_link, comment, created_at) VALUES (?, ?, ?, NOW())");
+        if ($insert_stmt === false) {
+            die("SQL Error: " . $conn->error);
+        }
+
+        $insert_stmt->bind_param("iss", $user_id, $news_link, $comment);
+        if ($insert_stmt->execute()) {
+            $insert_stmt->close();
+            header("Location: viewarticle.php" . $_SERVER['REQUEST_URI']);
+            exit();
+        } else {
+            $insert_stmt->close();
+            die("Failed to post comment: " . $insert_stmt->error);
+        }
+    }
+}
 
 
 // RSS feed URL
@@ -192,6 +216,7 @@ $comments_result = $comments_stmt->get_result();
         <div class="comments">
             <h3>Comments</h3>
             <?php while ($comment = $comments_result->fetch_assoc()): ?>
+
                 <div class="comment">
                     <img src="<?php echo htmlspecialchars(!empty($comment['profile_pic']) ? $comment['profile_pic'] : 'uploads/profile_676a90d5730da9.35741794.png'); ?>" 
                     alt="Profile Picture" 
@@ -206,7 +231,7 @@ $comments_result = $comments_stmt->get_result();
             <?php endwhile; ?>
         </div>
 
-        
+
         <!-- Comment Form (Logged-in Users Only) -->
         <div class="comment-form">
             <?php if (isset($_SESSION['user_id'])): ?>
