@@ -52,9 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_pic'])) {
     if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true)) {
         die("Failed to create directory: " . error_get_last()['message']);
     }
-    
-    
-    
+
+
+
 
     // File validation
     if (!in_array($fileType, $allowedTypes)) {
@@ -206,10 +206,11 @@ $conn->close();
         <div class="profile-info">
             <h2>Welcome, <?php echo htmlspecialchars($db_username); ?></h2>
             <p>Age: <?php echo htmlspecialchars($db_age); ?></p>
-            <p>Gender: <?php echo htmlspecialchars($db_gender); ?></p>           
+            <p>Gender: <?php echo htmlspecialchars($db_gender); ?></p>
             <?php if (!empty($db_profile_pic)): ?>
                 <h3>Your Profile Picture:</h3>
-                <img src="<?php echo htmlspecialchars($db_profile_pic); ?>" alt="Profile Picture" style="max-width:200px; margin-top:10px;">
+                <img src="<?php echo htmlspecialchars($db_profile_pic); ?>" alt="Profile Picture"
+                    style="max-width:200px; margin-top:10px;">
             <?php else: ?>
                 <h3>No profile picture uploaded.</h3>
             <?php endif; ?>

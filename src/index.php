@@ -160,8 +160,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
             // Atom formatındaki 'entry' etiketlerini işle
             foreach ($rss->entry as $item) {
                 $title = $item->title; // // Haber başlığı
-
-                $link = (string)$item->link['href'] ?: (string)$item->id;
+            
+                $link = (string) $item->link['href'] ?: (string) $item->id;
 
                 $content = strip_tags($item->content); // İçerik (HTML temizlenmiş)
                 $published = date("d-m-Y H:i", strtotime($item->published)); // Yayınlanma tarihi
