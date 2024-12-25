@@ -3,14 +3,15 @@ session_start();
 
 // Check if user is logged in
 $isLoggedIn = isset($_SESSION['user_id']);
+// $isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin'; // Check if user is admin
 
-// RSS feed URL'sini tanımla
+// RSS feed URL
 $rss_url = "https://www.ntv.com.tr/seyahat.rss";
 
-// RSS feed'i yükle
+// Load RSS feed
 $rss = simplexml_load_file($rss_url);
 
-// Hata kontrolü
+// Error check
 if ($rss === false) {
     echo "A valid RSS XML response could not be retrieved.";
     exit;
@@ -154,7 +155,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
             max-width: 100%;
         }
 
-
         .news-item p {
             font-size: 14px;
             color: #555;
@@ -165,6 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
             text-decoration: none;
             color: #007BFF;
             font-weight: bold;
+        }
         }
     </style>
 </head>
@@ -180,9 +181,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
         <ul>
             <li><a href="index.php">Dashboard</a></li>
             <li><a href="search.php">Search Travel News</a></li>
+            <li><a href="trending_searches.php">Trending</a></li>
             <?php if (isset($_SESSION['user_id'])): ?>
+                <li class="subtitle">Hello, <?php echo htmlspecialchars($_SESSION['username']); ?>! </li>
+                <li><a href="admin.php">Admin Panel</a></li>
+                <li><a href="add_admin.php">Add Admin</a></li>
                 <li><a href="profile.php">Profile</a></li>
-                <li class="greeting">Hello, <?php echo htmlspecialchars($_SESSION['username']); ?>! </li>
+               
             <?php else: ?>
                 <li><a href="login.php">Login</a></li>
             <?php endif; ?>
@@ -192,17 +197,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
     <!-- Dashboard Content Section -->
     <div class="dashboard-content">
         <h2>Latest Travel News</h2>
+
         <div class="news-container">
             <?php
             // Atom formatındaki 'entry' etiketlerini işle
             foreach ($rss->entry as $item) {
-                $title = $item->title; // // Haber başlığı
-            
+                $title = $item->title; // Haber başlığı
                 $link = (string) $item->link['href'] ?: (string) $item->id;
-
                 $content = strip_tags($item->content); // İçerik (HTML temizlenmiş)
                 $published = date("d-m-Y H:i", strtotime($item->published)); // Yayınlanma tarihi
-            
+
                 // Haber kutusunu ekrana yazdır
                 echo '<div class="news-item">';
                 echo '<h3>' . htmlspecialchars($title) . '</h3>';

@@ -37,13 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id']) && isse
     $news_link = $_POST['news_link'];
     $comment = trim($_POST['comment']);
 
-
     if (!empty($comment)) {
-
-        /*
-        VULNERABILITY:
-        All HTML tags and special characters are saved as they are in the database. This exposes the we page to stored XSS if users key in html tags such as <script>.
-        */
         // Prepare and execute the insert query
         $insert_stmt = $conn->prepare("INSERT INTO article_comments (user_id, news_link, comment, created_at) VALUES (?, ?, ?, NOW())");
         if ($insert_stmt === false) {
@@ -61,8 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id']) && isse
         }
     }
 }
-
-
 
 // Fetch comments for the article
 $comments_stmt = $conn->prepare("SELECT users.username, users.profile_pic, article_comments.comment, article_comments.created_at 
@@ -84,26 +76,51 @@ $comments_result = $comments_stmt->get_result();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Article Comments</title>
-    <!-- Navigation Menu -->
-    <div class="nav-container">
-        <ul>
-            <li><a href="index.php">Dashboard</a></li>
-            <li><a href="search.php">Search Travel News</a></li>
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <li><a href="profile.php">Profile</a></li>
-                <li class="greeting">Hello, <?php echo htmlspecialchars($_SESSION['username']); ?>! </li>
-            <?php else: ?>
-                <li><a href="login.php">Login</a></li>
-            <?php endif; ?>
-        </ul>
-    </div>
-
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f4f4f9;
+        }
+
+        .header {
+            background-color: #262673;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .nav-container {
+            background-color: #f8f9fa;
+            padding: 10px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+        }
+
+        .nav-container ul li {
+            display: inline;
+            margin: 0 15px;
+        }
+
+        .nav-container ul li a {
+            text-decoration: none;
+            color: #262673;
+            font-weight: bold;
+            font-size: 18px;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .nav-container ul li a:hover {
+            background-color: #007BFF;
+            color: white;
         }
 
         .container {
@@ -191,6 +208,25 @@ $comments_result = $comments_stmt->get_result();
 </head>
 
 <body>
+    <div class="header">
+        <h1>Article Comments</h1>
+    </div>
+
+    <!-- Navigation Menu -->
+    <div class="nav-container">
+        <ul>
+            <li><a href="index.php">Dashboard</a></li>
+            <li><a href="search.php">Search Travel News</a></li>
+            <li><a href="trending_searches.php">Trending</a></li>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <li><a href="profile.php">Profile</a></li>
+                <li class="greeting">Hello, <?php echo htmlspecialchars($_SESSION['username']); ?>! </li>
+            <?php else: ?>
+                <li><a href="login.php">Login</a></li>
+            <?php endif; ?>
+        </ul>
+    </div>
+
     <div class="container">
         <!-- Display Article -->
         <div class="article">
@@ -217,7 +253,6 @@ $comments_result = $comments_stmt->get_result();
             <?php endwhile; ?>
         </div>
 
-
         <!-- Comment Form (Logged-in Users Only) -->
         <div class="comment-form">
             <?php if (isset($_SESSION['user_id'])): ?>
@@ -232,7 +267,6 @@ $comments_result = $comments_stmt->get_result();
                 <p><strong>You have to <a href="login.php">log in</a> before you can comment.</strong></p>
             <?php endif; ?>
         </div>
-
     </div>
 </body>
 

@@ -73,20 +73,57 @@ $comments_stmt->execute();
 $comments_result = $comments_stmt->get_result();
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Manage Users and Comments</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f4f4f9;
+        }
+
+        .header {
+            background-color: #262673;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .nav-container {
+            background-color: #f8f9fa;
+            padding: 10px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+        }
+
+        .nav-container ul li {
+            display: inline;
+            margin: 0 15px;
+        }
+
+        .nav-container ul li a {
+            text-decoration: none;
+            color: #262673;
+            font-weight: bold;
+            font-size: 18px;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .nav-container ul li a:hover {
+            background-color: #007BFF;
+            color: white;
         }
 
         .container {
@@ -167,8 +204,26 @@ $comments_result = $comments_stmt->get_result();
 </head>
 
 <body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Admin Panel</h1>
+    </div>
+
+    <!-- Navigation Menu -->
+    <div class="nav-container">
+        <ul>
+            <li><a href="index.php">Dashboard</a></li>
+            <li><a href="search.php">Search Travel News</a></li>
+            <li><a href="trending_searches.php">Trending</a></li>
+            <li><a href="profile.php">Profile</a></li>
+            <li><a href="admin.php" style="color: green;">Admin Panel</a></li>
+            <li><a href="add_admin.php" style="color: orange;">Assign New Admin</a></li>
+            <li><a href="logout.php" style="color: red;">Logout</a></li>
+        </ul>
+    </div>
+
     <div class="container">
-        <h2>Admin Panel - Manage Users</h2>
+        <h2>Manage Users</h2>
         <table class="user-table">
             <thead>
                 <tr>
@@ -206,7 +261,7 @@ $comments_result = $comments_stmt->get_result();
             </tbody>
         </table>
 
-        <h2>Admin Panel - Manage Comments</h2>
+        <h2>Manage Comments</h2>
         <table>
             <thead>
                 <tr>
@@ -237,10 +292,6 @@ $comments_result = $comments_stmt->get_result();
                 <?php endwhile; ?>
             </tbody>
         </table>
-
-
-
-
 
         <a href="index.php" class="back-btn">Back to Home</a>
     </div>

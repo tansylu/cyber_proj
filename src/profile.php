@@ -2,29 +2,8 @@
 session_start();
 include 'database.php';
 
-require($_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php');
-$dotenv = Dotenv\Dotenv::createImmutable($_SERVER['DOCUMENT_ROOT'] . '/../');
-$dotenv->load();
-
 // Check if the user is logged in, if not, redirect to login page
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) {
-    header("Location: login.php");
-    exit();
-}
-
-// Database connection (use environment variables)
-$servername = $_SERVER['DB_SERVERNAME'] ?? 'default_servername';
-$username = $_SERVER['DB_USERNAME'] ?? 'default_username';
-$password = $_SERVER['DB_PASSWORD'] ?? 'default_password';
-$dbname = $_SERVER['DB_NAME'] ?? 'default_dbname';
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
@@ -49,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_pic'])) {
     }
 
     /*
-    VULNERABILTIY:
+    VULNERABILITY:
     File types or content are not properly validated. As such, users can upload a malicious file in the profile picture field that may execute on the server, leading
     to unrestricted upload of file with dangerous type vulnerability.
     */
@@ -194,14 +173,14 @@ $conn->close();
             <li><a href="search.php">Search Travel News</a></li>
             <li><a href="profile.php">Profile</a></li>
 
-            <!-- PATCHED: verify user role before displaying admin panel -->
-            <?php if ($db_role === 'admin'): ?>
+            <!-- todo: verify user role before displaying admin panel -->
+            <?php if ($db_role === 'admin' or $db_role === 'user' ): ?>
                 <li><a href="admin.php" style="color: green;">Admin Panel</a></li>
+                <li><a href="add_admin.php" style="color: orange;">Assign New Admin</a></li>
             <?php endif; ?>
             <li><a href="logout.php" style="color: red;">Logout</a></li>
         </ul>
     </div>
-
 
     <div class="profile-container">
         <div class="profile-info">

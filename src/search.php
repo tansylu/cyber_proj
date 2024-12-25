@@ -5,25 +5,34 @@ include 'database.php'; // Include database connection
 $searchResults = [];
 $searchQuery = '';
 
-// Handle Search Query
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['query'])) {
     $searchQuery = trim($_GET['query']); // Get the search query and remove extra spaces
 
     if (!empty($searchQuery)) {
+        // Insert the search query into the search_queries table
+        $stmt = $conn->prepare("INSERT INTO search_queries (query) VALUES (?)");
+        $stmt->bind_param("s", $searchQuery);
+        $stmt->execute();
+        $stmt->close();
+
         // Fetch the RSS feed and parse it
         $rssUrl = "https://www.ntv.com.tr/seyahat.rss";
         $rss = simplexml_load_file($rssUrl);
         if ($rss) {
-            // Loop through each RSS item and check if the title contains the search term (case-insensitive, partial match)
+            // Loop through each RSS item
             foreach ($rss->entry as $item) {
-                echo($item);
-                $title = $item->title; 
+                $title = (string)$item->title; // News title
+                $link = (string)$item->link['href'] ?: (string)$item->id; // News link
+                $description = strip_tags($item->content); // Clean HTML from content
+                $pubDate = (string)$item->published; // Publication date
+
+                // Check if the title contains the search query (case-insensitive, partial match)
                 if (stripos($title, $searchQuery) !== false) {
                     $searchResults[] = [
                         'title' => $title,
-                        'link' => (string)$item->link,
-                        'description' => (string)$item->description,
-                        'pubDate' => (string)$item->pubDate,
+                        'link' => $link,
+                        'description' => $description,
+                        'pubDate' => $pubDate,
                     ];
                 }
             }
@@ -175,8 +184,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['query'])) {
 </head>
 
 <body>
+    <!-- Header Section -->
     <div class="header">
-        <h1>Search Travel News</h1>
+        <h1>Travel Advisory Dashboard</h1>
     </div>
 
     <!-- Navigation Menu -->
@@ -184,16 +194,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['query'])) {
         <ul>
             <li><a href="index.php">Dashboard</a></li>
             <li><a href="search.php">Search Travel News</a></li>
+            <li><a href="trending_searches.php">Trending</a></li>
             <?php if (isset($_SESSION['user_id'])): ?>
+                <li>Hello, <?php echo htmlspecialchars($_SESSION['username']); ?>!</li>
+                <li><a href="admin.php">Admin Panel</a></li>
+                <li><a href="add_admin.php">Add Admin</a></li>
                 <li><a href="profile.php">Profile</a></li>
-                <li class="greeting">Hello, <?php echo htmlspecialchars($_SESSION['username']); ?>! </li>
             <?php else: ?>
                 <li><a href="login.php">Login</a></li>
             <?php endif; ?>
         </ul>
     </div>
 
-    <!-- Search Form -->
     <div class="search-container">
         <form method="GET" class="search-form">
             <input type="text" name="query" placeholder="Search travel news..." value="<?php echo htmlspecialchars($searchQuery); ?>" required>
@@ -201,7 +213,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['query'])) {
         </form>
     </div>
 
-    <!-- Search Results -->
     <div class="search-results-container">
         <?php if (!empty($searchQuery)): ?>
             <h2>Search Results for "<?php echo htmlspecialchars($searchQuery); ?>"</h2>
@@ -216,7 +227,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['query'])) {
                             </h3>
                             <p><strong>Published:</strong> <?php echo date("d-m-Y H:i", strtotime($result['pubDate'])); ?></p>
                             <p><?php echo htmlspecialchars(mb_substr($result['description'], 0, 150)); ?>...</p>
-                            <a href="<?php echo htmlspecialchars($result['link']); ?>" target="_blank">Read More</a>
+                            <div>
+                                <a href="viewarticle.php?news_link=<?php echo urlencode($result['link']); ?>" style="color: #007BFF; text-decoration: none; font-weight: bold; padding: 5px 10px; border: 1px solid #007BFF; border-radius: 5px;">View article</a>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
