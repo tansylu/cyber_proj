@@ -20,10 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
 
     /*
-    PATCHED:
-    Password is hashed to prvent any cleartext storage of sensitive information.
+    VULNERABILITY:
+    Password is stored as cleartext in the database. This is not secure as any attacks on the database will reveal sensitive information.
     */
-
     $password = $_POST['password'];
     $age = $_POST['age'] ?? NULL;  // Default to NULL if no age provided
     $gender = $_POST['gender'] ?? NULL;  // Default to NULL if no gender provided
