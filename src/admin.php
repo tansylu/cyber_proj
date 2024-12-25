@@ -7,10 +7,10 @@ if ($_SERVER['REMOTE_ADDR'] === '127.0.0.1') {
     $_SESSION['role'] = 'admin';
 }
 
-// // Check if the user is an admin
-// if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-//     die("Access denied. You must be an admin to view this page.");
-// }
+/*
+VULNERABILITY:
+No validation is conducted to check if user is an admin. As such, any user will be able to access the admin panel, causing missing authorisation. 
+*/
 
 // Handle User Deletion
 if (isset($_POST['delete_user_id'])) {
@@ -163,9 +163,6 @@ $comments_result = $comments_stmt->get_result();
         .back-btn:hover {
             background-color: #16334a;
         }
-
-        
-
     </style>
 </head>
 
@@ -227,7 +224,8 @@ $comments_result = $comments_stmt->get_result();
                         <td><?php echo htmlspecialchars($comment['id']); ?></td>
                         <td><?php echo htmlspecialchars($comment['username']); ?></td>
                         <td><?php echo htmlspecialchars($comment['comment']); ?></td>
-                        <td><a href="<?php echo htmlspecialchars($comment['news_link']); ?>" target="_blank">View Article</a></td>
+                        <td><a href="<?php echo htmlspecialchars($comment['news_link']); ?>" target="_blank">View
+                                Article</a></td>
                         <td><?php echo htmlspecialchars($comment['created_at']); ?></td>
                         <td>
                             <form method="POST" onsubmit="return confirm('Are you sure you want to delete this comment?');">
