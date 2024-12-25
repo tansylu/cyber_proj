@@ -2,6 +2,11 @@
 session_start();
 include 'database.php'; // Ensure this file connects to your database
 
+/*
+VULNERABILITY:
+No validation is conducted to check if user is an admin. As such, any user will be able to access the admin panel, causing missing authorisation. 
+*/
+
 $error = '';
 $success = '';
 
