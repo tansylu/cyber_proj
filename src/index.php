@@ -149,7 +149,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
             margin: 0 0 10px;
             font-size: 18px;
             color: #007BFF;
+            font-weight: bold;
+            line-height: 1.4;
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
         }
+
 
         .news-item p {
             font-size: 14px;
