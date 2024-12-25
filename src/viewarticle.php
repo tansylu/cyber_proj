@@ -197,7 +197,7 @@ $comments_result = $comments_stmt->get_result();
             <?php while ($comment = $comments_result->fetch_assoc()): ?>
 
                 <div class="comment">
-                    <img src="<?php echo htmlspecialchars(!empty($comment['profile_pic']) ? $comment['profile_pic'] : '../uploads/profile_676a90d5730da9.35741794.png'); ?>"
+                    <img src="<?php echo htmlspecialchars(!empty($comment['profile_pic']) ? $comment['profile_pic'] : '../uploads/profile_676be065b40b56.99402766.png'); ?>"
                         alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
                     <p>
 
