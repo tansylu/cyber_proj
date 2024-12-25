@@ -38,13 +38,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id']) && isse
     $comment = trim($_POST['comment']);
 
     if (!empty($comment)) {
+        /*
+        PATCHED:
+        This removes all HTML tags and escape special characters. This prevents users from entering HTML tags that can execute stored XSS
+        */
+
+        $safe_comment = htmlspecialchars(strip_tags($comment), ENT_QUOTES, 'UTF-8');
+
         // Prepare and execute the insert query
         $insert_stmt = $conn->prepare("INSERT INTO article_comments (user_id, news_link, comment, created_at) VALUES (?, ?, ?, NOW())");
         if ($insert_stmt === false) {
             die("SQL Error: " . $conn->error);
         }
 
-        $insert_stmt->bind_param("iss", $user_id, $news_link, $comment);
+        $insert_stmt->bind_param("iss", $user_id, $news_link, $safe_comment);
         if ($insert_stmt->execute()) {
             $insert_stmt->close();
             header("Location: viewarticle.php?news_link=" . urlencode($news_link));

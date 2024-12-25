@@ -28,17 +28,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_pic'])) {
     }
 
     /*
-    VULNERABILITY:
-    File types or content are not properly validated. As such, users can upload a malicious file in the profile picture field that may execute on the server, leading
-    to unrestricted upload of file with dangerous type vulnerability.
+    PATCHED:
+    A whitelist is defined for allowed filetypes to prevent unrestricted upload of file with dangerous type
     */
 
-    if ($_FILES['profile_pic']['size'] > 2 * 1024 * 1024) { // Limit file size to 2MB
+    $allowedTypes = ['jpg', 'jpeg', 'png', 'gif']; // Allowed file types
+
+    if (!in_array($fileType, $allowedTypes)) {
+        echo "<p style='color:red;'>Error: Only JPG, JPEG, PNG, and GIF files are allowed.</p>";
+    } elseif ($_FILES['profile_pic']['size'] > 2 * 1024 * 1024) { // Limit file size to 2MB
         echo "<p style='color:red;'>Error: File size exceeds 2MB limit.</p>";
     } else {
-        // // Rename the file to avoid overwrites
-        // $uploadFile = $uploadDir . uniqid('profile_', true) . '.' . $fileType;
-
         if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $uploadFile)) {
             // Update the database with the new file path
             $stmt = $conn->prepare("UPDATE users SET profile_pic = ? WHERE id = ?");

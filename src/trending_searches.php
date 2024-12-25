@@ -118,7 +118,7 @@ if (!$result) {
         <ul class="trending-list">
             <?php while ($row = $result->fetch_assoc()): ?>
                 <li>
-                    <strong><?php echo $row['query']; ?></strong> <!-- Vulnerable to XSS -->
+                    <strong><?php echo $row['query']; ?></strong>
                     <br>
                     <small>Timestamp: <?php echo date("d-m-Y H:i", strtotime($row['timestamp'])); ?></small>
                 </li>

@@ -8,9 +8,13 @@ if ($_SERVER['REMOTE_ADDR'] === '127.0.0.1') {
 }
 
 /*
-VULNERABILITY:
-No validation is conducted to check if user is an admin. As such, any user will be able to access the admin panel, causing missing authorisation. 
+PATCHED:
+Check if user is an admin. If not, do not allow user to acces admin panel.
 */
+if (!isset($_SESSION['user_id']) || (isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') || !isset($_SESSION['role'])) {
+    echo '<script>alert("Access denied. You must be an admin to view this page."); window.location.href = "index.php";</script>';
+    exit();
+}
 
 // Handle User Deletion
 if (isset($_POST['delete_user_id'])) {
@@ -250,7 +254,7 @@ $comments_result = $comments_stmt->get_result();
                                 alt="Profile Picture" class="profile-pic">
                         </td>
                         <td><?php echo htmlspecialchars($user['username']); ?></td>
-                        <td><?php echo htmlspecialchars($user['password']); ?></td> <!-- Display password -->
+                        <td><?php echo htmlspecialchars($user['password']); ?></td>
                         <td><?php echo htmlspecialchars($user['age'] ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($user['gender'] ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($user['role']); ?></td>

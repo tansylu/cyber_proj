@@ -17,10 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($stmt->num_rows > 0) {
         $stmt->bind_result($id, $db_username, $db_password);
         $stmt->fetch();
-        if($password ==$db_password) {
+        if (password_verify($password, $db_password)) {
             $_SESSION['user_id'] = $id;
             $_SESSION['username'] = $db_username;
-            
+            $_SESSION['role'] = $db_role;
             header("Location: profile.php");
             exit();
         } else {
