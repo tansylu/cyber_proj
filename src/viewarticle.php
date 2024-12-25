@@ -41,19 +41,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id']) && isse
     if (!empty($comment)) {
 
         /*
-        PATCHED:
-        This removes all HTML tags and escape special characters. This prevents users from entering HTML tags that can execute stored XSS
+        VULNERABILITY:
+        All HTML tags and special characters are saved as they are in the database. This exposes the we page to stored XSS if users key in html tags such as <script>.
         */
-
-        $safe_comment = htmlspecialchars(strip_tags($comment), ENT_QUOTES, 'UTF-8');
-
         // Prepare and execute the insert query
         $insert_stmt = $conn->prepare("INSERT INTO article_comments (user_id, news_link, comment, created_at) VALUES (?, ?, ?, NOW())");
         if ($insert_stmt === false) {
             die("SQL Error: " . $conn->error);
         }
 
-        $insert_stmt->bind_param("iss", $user_id, $news_link, $safe_comment);
+        $insert_stmt->bind_param("iss", $user_id, $news_link, $comment);
         if ($insert_stmt->execute()) {
             $insert_stmt->close();
             header("Location: viewarticle.php?news_link=" . urlencode($news_link));
@@ -195,15 +192,12 @@ $comments_result = $comments_stmt->get_result();
         <div class="comments">
             <h3>Comments</h3>
             <?php while ($comment = $comments_result->fetch_assoc()): ?>
-
                 <div class="comment">
-                    <img src="<?php echo htmlspecialchars(!empty($comment['profile_pic']) ? $comment['profile_pic'] : '../uploads/profile_676be065b40b56.99402766.png'); ?>"
+                    <img src="<?php echo !empty($comment['profile_pic']) ? $comment['profile_pic'] : '../uploads/default_profile.png'; ?>"
                         alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
                     <p>
-
-
-                        <strong><?php echo htmlspecialchars($comment['username']); ?>:</strong>
-                        <?php echo htmlspecialchars($comment['comment']); ?>
+                        <strong><?php echo $comment['username']; ?>:</strong>
+                        <?php echo $comment['comment']; ?> <!-- Vulnerable to XSS -->
                     </p>
                 </div>
             <?php endwhile; ?>
