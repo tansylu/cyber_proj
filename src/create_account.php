@@ -1,16 +1,30 @@
 <?php
 session_start();
-include 'database.php'; // Include database connection
+require($_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php');
+$dotenv = Dotenv\Dotenv::createImmutable($_SERVER['DOCUMENT_ROOT'] . '/../');
+$dotenv->load();
+
+$servername = $_SERVER['DB_SERVERNAME'] ?? 'default_servername';
+$username = $_SERVER['DB_USERNAME'] ?? 'default_username';
+$password = $_SERVER['DB_PASSWORD'] ?? 'default_password';
+$dbname = $_SERVER['DB_NAME'] ?? 'default_dbname';
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Sanitize user input
     $username = $_POST['username'];
 
     /*
-    VULNERABILITY:
-    Password is stored as cleartext in the database. This is not secure as any attacks on the database will reveal sensitive information.
+    PATCHED:
+    Password is hashed to prvent any cleartext storage of sensitive information.
     */
-    $password = $_POST['password'];
+
+    $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
     $age = $_POST['age'] ?? NULL;  // Default to NULL if no age provided
     $gender = $_POST['gender'] ?? NULL;  // Default to NULL if no gender provided
     $profile_pic = $_POST['profile_pic'] ?? NULL;  // Default to NULL if no profile pic provided
@@ -28,27 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Execute statement
     if ($stmt->execute()) {
-        // Fetch the inserted password
-        $stmt->close();
-        $select_stmt = $conn->prepare("SELECT password FROM users WHERE username = ?");
-        if ($select_stmt === false) {
-            die('MySQL prepare error: ' . $conn->error);
-        }
-
-        $select_stmt->bind_param("s", $username);
-        $select_stmt->execute();
-        $select_stmt->bind_result($stored_password);
-        $select_stmt->fetch();
-        $select_stmt->close();
-
-        // On success, set session variables and display popup
-        $_SESSION['user_id'] = $conn->insert_id;
+        // On success, set session variables and redirect
+        $user_id = $stmt->insert_id;
+        $_SESSION['user_id'] = $user_id;
         $_SESSION['username'] = $username;
-        $success_message = "Your account has been created successfully. Your password is: $stored_password";
-        echo "<script>
-            alert('$success_message');
-            window.location.href = 'profile.php';
-        </script>";
+        header("Location: profile.php");
         exit();
     } else {
         // On failure, show error
@@ -66,7 +64,79 @@ $conn->close();
 
 <head>
     <style>
-        /* Styles omitted for brevity */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 20px;
+        }
+
+        .create-account-container {
+            max-width: 400px;
+            margin: 50px auto;
+            text-align: center;
+        }
+
+        .create-account-form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .create-account-form input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .create-account-form select {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .create-account-form button {
+            width: 100%;
+            padding: 10px;
+            background-color: blue;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .create-account-form button:hover {
+            background-color: #007BFF;
+        }
+
+        .link-container {
+            margin-top: 10px;
+        }
+
+        .link-container a {
+            display: inline-block;
+            text-decoration: none;
+            color: blue;
+            font-weight: bold;
+            margin-right: 10px;
+            margin-left: 10px;
+            margin-bottom: 5px;
+        }
+
+        .link-container a:hover {
+            color: darkblue;
+        }
+
+        .error {
+            color: red;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 
