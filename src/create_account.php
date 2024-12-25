@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     Password is hashed to prvent any cleartext storage of sensitive information.
     */
 
-    $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
+    $password = $_POST['password'];
     $age = $_POST['age'] ?? NULL;  // Default to NULL if no age provided
     $gender = $_POST['gender'] ?? NULL;  // Default to NULL if no gender provided
     $profile_pic = $_POST['profile_pic'] ?? NULL;  // Default to NULL if no profile pic provided
