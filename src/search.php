@@ -203,6 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['query'])) {
             <?php else: ?>
                 <li><a href="login.php">Login</a></li>
             <?php endif; ?>
+            <li><a href="logout.php" style="color: red;">Logout</a></li>
         </ul>
     </div>
 

@@ -100,16 +100,24 @@ session_start();
         <h1>Post a Comment</h1>
     </div>
 
-    <!-- Navigation Menu -->
-    <div class="nav-container">
+     <!-- Navigation Menu -->
+     <div class="nav-container">
         <ul>
             <li><a href="index.php">Dashboard</a></li>
-            <li><a href="search.php">Search Travel Advisories</a></li>
-            <li><a href="comment.php">Post Comments</a></li>
-            <li><a href="login.php">Login</a></li>
-            <li><a href="profile.php">Profile</a></li>
+            <li><a href="search.php">Search Travel News</a></li>
+            <li><a href="trending_searches.php">Trending</a></li>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <li>Hello, <?php echo htmlspecialchars($_SESSION['username']); ?>!</li>
+                <li><a href="admin.php">Admin Panel</a></li>
+                <li><a href="add_admin.php">Add Admin</a></li>
+                <li><a href="profile.php">Profile</a></li>
+            <?php else: ?>
+                <li><a href="login.php">Login</a></li>
+            <?php endif; ?>
+            <li><a href="logout.php" style="color: red;">Logout</a></li>
         </ul>
     </div>
+
 
     <!-- Comment Form -->
     <div class="comment-container">

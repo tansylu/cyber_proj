@@ -183,16 +183,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
             <li><a href="search.php">Search Travel News</a></li>
             <li><a href="trending_searches.php">Trending</a></li>
             <?php if (isset($_SESSION['user_id'])): ?>
-                <li class="subtitle">Hello, <?php echo htmlspecialchars($_SESSION['username']); ?>! </li>
+                <li>Hello, <?php echo htmlspecialchars($_SESSION['username']); ?>!</li>
                 <li><a href="admin.php">Admin Panel</a></li>
                 <li><a href="add_admin.php">Add Admin</a></li>
                 <li><a href="profile.php">Profile</a></li>
-               
             <?php else: ?>
                 <li><a href="login.php">Login</a></li>
             <?php endif; ?>
+            <li><a href="logout.php" style="color: red;">Logout</a></li>
         </ul>
     </div>
+
 
     <!-- Dashboard Content Section -->
     <div class="dashboard-content">

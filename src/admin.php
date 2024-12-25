@@ -32,14 +32,13 @@ if (isset($_POST['delete_user_id'])) {
     }
 }
 
-// Fetch all users
-$users_stmt = $conn->prepare("SELECT id, username, profile_pic, age, gender, role, created_at FROM users ORDER BY created_at DESC");
+// Fetch all users (including password field)
+$users_stmt = $conn->prepare("SELECT id, username, password, profile_pic, age, gender, role, created_at FROM users ORDER BY created_at DESC");
 if ($users_stmt === false) {
     die("SQL Error: " . $conn->error);
 }
 $users_stmt->execute();
 $users_result = $users_stmt->get_result();
-
 
 // Handle Comment Deletion
 if (isset($_POST['delete_comment_id'])) {
@@ -59,7 +58,6 @@ if (isset($_POST['delete_comment_id'])) {
         die("Failed to delete comment: " . $delete_stmt->error);
     }
 }
-
 
 // Fetch all comments
 $comments_stmt = $conn->prepare("SELECT article_comments.id, article_comments.comment, article_comments.created_at, users.username, article_comments.news_link 
@@ -215,9 +213,14 @@ $comments_result = $comments_stmt->get_result();
             <li><a href="index.php">Dashboard</a></li>
             <li><a href="search.php">Search Travel News</a></li>
             <li><a href="trending_searches.php">Trending</a></li>
-            <li><a href="profile.php">Profile</a></li>
-            <li><a href="admin.php" style="color: green;">Admin Panel</a></li>
-            <li><a href="add_admin.php" style="color: orange;">Assign New Admin</a></li>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <li>Hello, <?php echo htmlspecialchars($_SESSION['username']); ?>!</li>
+                <li><a href="admin.php">Admin Panel</a></li>
+                <li><a href="add_admin.php">Add Admin</a></li>
+                <li><a href="profile.php">Profile</a></li>
+            <?php else: ?>
+                <li><a href="login.php">Login</a></li>
+            <?php endif; ?>
             <li><a href="logout.php" style="color: red;">Logout</a></li>
         </ul>
     </div>
@@ -230,6 +233,7 @@ $comments_result = $comments_stmt->get_result();
                     <th>ID</th>
                     <th>Profile Picture</th>
                     <th>Username</th>
+                    <th>Password</th>
                     <th>Age</th>
                     <th>Gender</th>
                     <th>Role</th>
@@ -246,6 +250,7 @@ $comments_result = $comments_stmt->get_result();
                                 alt="Profile Picture" class="profile-pic">
                         </td>
                         <td><?php echo htmlspecialchars($user['username']); ?></td>
+                        <td><?php echo htmlspecialchars($user['password']); ?></td> <!-- Display password -->
                         <td><?php echo htmlspecialchars($user['age'] ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($user['gender'] ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($user['role']); ?></td>
