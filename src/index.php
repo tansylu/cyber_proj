@@ -21,19 +21,21 @@ VULNERABILITY:
 This blacklist only prevents a certain hostname to be used in the URL while allowing all other hostnames/IP addresses. This leads to a potential SSRF
 with a blacklist-based input filter vulnerability.
 */
-$blacklist = ['localhost'];
+$whitelist = [
+    'www.ntv.com.tr',
+];
 
-// Function to check if a URL is in the blacklist
-function isUrlBlocked($url, $blacklist)
+// Function to check if a URL is in the whitelist
+function isUrlAllowed($url, $whitelist)
 {
     $parsedUrl = parse_url($url);
     if (!$parsedUrl || !isset($parsedUrl['host'])) {
-        return true; // Block invalid URLs
+        return false; // Block invalid URLs
     }
     $host = $parsedUrl['host'];
 
-    // Simple host-based blacklist check (intentionally weak for demonstration)
-    if (in_array($host, $blacklist)) {
+    // Check if the host is in the whitelist
+    if (in_array($host, $whitelist)) {
         return true;
     }
 
@@ -44,12 +46,13 @@ function isUrlBlocked($url, $blacklist)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
     $news_link = $_POST['news_link'];
 
-    // Validate the URL against the blacklist
-    if (isUrlBlocked($news_link, $blacklist)) {
-        echo "Access to this URL is blocked for security reasons.";
+    // Validate the URL against the whitelist
+    if (!isUrlAllowed($news_link, $whitelist)) {
+        echo "Access to this URL is restricted due to security reasons.";
         exit;
     }
 
+    // Fetch and display content from the trusted URL
     $response = file_get_contents($news_link);
     echo $response;
 }
