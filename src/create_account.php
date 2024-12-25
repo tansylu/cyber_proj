@@ -18,6 +18,12 @@ if ($conn->connect_error) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Sanitize user input
     $username = $_POST['username'];
+
+    /*
+    PATCHED:
+    Password is hashed to prvent any cleartext storage of sensitive information.
+    */
+
     $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
     $age = $_POST['age'] ?? NULL;  // Default to NULL if no age provided
     $gender = $_POST['gender'] ?? NULL;  // Default to NULL if no gender provided

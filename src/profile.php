@@ -1,5 +1,6 @@
 <?php
 session_start();
+include 'database.php';
 
 require($_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php');
 $dotenv = Dotenv\Dotenv::createImmutable($_SERVER['DOCUMENT_ROOT'] . '/../');
@@ -23,10 +24,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-
-
-include 'database.php';
-
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
@@ -47,6 +44,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_pic'])) {
     $uploadDir = 'uploads/'; // Directory for uploaded files
     $uploadFile = $uploadDir . basename($_FILES['profile_pic']['name']);
     $fileType = strtolower(pathinfo($uploadFile, PATHINFO_EXTENSION)); // Get file extension
+
+    /*
+    PATCHED:
+    A whitelist is defined for allowed filetypes to prevent unrestricted upload of file with dangerous type
+    */
+
     $allowedTypes = ['jpg', 'jpeg', 'png', 'gif']; // Allowed file types
 
     if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true)) {
