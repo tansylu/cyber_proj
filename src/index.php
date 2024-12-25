@@ -17,8 +17,8 @@ if ($rss === false) {
 }
 
 /*
-VULNERABILITY:
-This blacklist only prevents a certain hostname to be used in the URL while allowing all other hostnames/IP addresses. This leads to a potential SSRF
+PATCHED:
+This whitelist only allows a certain hostname to be used in the URL while preventing all other hostnames/IP addresses. This fixes the issue of SSRF
 with a blacklist-based input filter vulnerability.
 */
 $whitelist = [
