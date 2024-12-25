@@ -1,4 +1,5 @@
-Name: Stored XSS (CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') Type 2)
+Name: Stored XSS (CWE-79: Improper Neutralization of Input During Web Page
+Generation ('Cross-site Scripting') Type 2)
 
 Category: A03:2021–Injection
 
@@ -15,7 +16,7 @@ Technical Explanation: CWE-692, Incomplete Denylist to Cross-Site Scripting is f
 validation and output encoding. Rather, an allowlist should be adopted, where only explicitly allowed input patterns are accepted. For example, input can be strictly constrained to alphanumeric characters, or limited to well-defined and validated HTML tags and attributes.  
 
 
-Exploit: Search function allows users to search for news. While it filters out tags such as <script>, the denylist fails to prevent all possible tags. This results in a malicious script being saved to the search database that will be visible in the admin panel that displays a list of recent searches. Upon loading, the script will execute. 
+Exploit: Search function allows users to search for news. While it filters out tags such as <script>, the denylist fails to prevent all possible tags. This results in a malicious script being saved to the search database that will be visible in the admin panel that displays a list of recent searches. Upon loading, the script will execute. A payload such as <form><button formaction="javascript:javascript:alert(1)">X will still be accepted and will execute upon clicking.
 
 
 Name: CWE-862: Missing Authorization  
@@ -27,7 +28,7 @@ Technical Explanation: CWE-862, Missing Authorization arises when a web applicat
 Exploit: Without proper access controls on the admin.php page, any user, regardless of their role, will be able to access this panel and perform admin-only actions such as deleting users and comments.
 
 
-Name: Server-Side Request Forgery with Blacklist-Based Input Filter  
+Name: Server-Side Request Forgery with blacklist-based input filter  
 
 Category: A10:2021 - Server-Side Request Forgery  
 
@@ -42,7 +43,7 @@ Category: A04:2021 – Insecure Design
 
 Technical Explanation: CWE-434, unrestricted upload of a file with a dangerous type, occurs when a web application allows users to upload files without properly validating the file type or content. Once uploaded, these files may be executed on the server, leading to remote code execution or other attacks. This vulnerability often arises because file validation mechanisms rely on superficial checks, such as file extension or MIME type, which are easily manipulated by attackers. The root cause is the lack of robust server-side validation to ensure uploaded files meet strict criteria, such as checking their actual content or ensuring they cannot be executed.  
 
-Exploit: Without checking the file type, any file with any extension will be able to be uploaded. A file containing the php code echo exec($_GET[‘cmd’]) when uploaded will allow attackers to access it and perform shell commands, for example ls to display all the files present. Attackers will have access to the internal files and perform malicious shell commands.
+Exploit:  Without checking the file type, any file with any extension will be able to be uploaded. A file containing the php code echo exec($_GET[‘cmd’]) when uploaded will allow attackers to access it and perform shell commands, for example /uploads/shell.php?cmd=uname%20-a to display the OS data. Attackers will have access to the internal files and terminal and perform malicious shell commands.
 
 
 Name: CWE-312: Cleartext Storage of Sensitive Information
@@ -51,4 +52,4 @@ Category: A04:2021 – Insecure Design
 
 Technical Explanation: CWE-312, cleartext storage of sensitive information, occurs when an application stores sensitive data such as passwords, tokens, or cryptographic keys in plaintext. This vulnerability arises from a failure to use encryption or hashing mechanisms to protect sensitive data at rest. For instance, passwords stored directly in a database without hashing allow attackers to immediately use the stolen credentials if the database is compromised. The fundamental issue is the absence of data protection mechanisms, such as using strong cryptographic algorithms or ensuring that sensitive data is only accessible to authorized systems and users. The impact of this vulnerability is severe, as it can lead to data breaches and unauthorized access.  
 
-Exploit: The database stores passwords in cleartext. Any attack that dumps the sql users table will reveal all the passwords of users in cleartext.
+Exploit: The database and admin panel stores passwords in cleartext. Any attack that dumps the sql users table or that can access the admin panel will reveal all the passwords of users in cleartext.
