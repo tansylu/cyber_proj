@@ -102,7 +102,7 @@ if (!$result) {
             <li><a href="search.php">Search Travel News</a></li>
             <li><a href="trending_searches.php">Trending</a></li>
             <?php if (isset($_SESSION['user_id'])): ?>
-                <li>Hello, <?php echo htmlspecialchars($_SESSION['username']); ?>!</li>
+                <li>Hello, <?php echo $_SESSION['username']; ?>!</li>
                 <li><a href="admin.php">Admin Panel</a></li>
                 <li><a href="add_admin.php">Add Admin</a></li>
                 <li><a href="profile.php">Profile</a></li>
@@ -113,13 +113,12 @@ if (!$result) {
         </ul>
     </div>
 
-
     <div class="container">
         <h2>Top 10 Trending Search Queries</h2>
         <ul class="trending-list">
             <?php while ($row = $result->fetch_assoc()): ?>
                 <li>
-                    <strong><?php echo htmlspecialchars($row['query']); ?></strong>
+                    <strong><?php echo $row['query']; ?></strong> <!-- Vulnerable to XSS -->
                     <br>
                     <small>Timestamp: <?php echo date("d-m-Y H:i", strtotime($row['timestamp'])); ?></small>
                 </li>
