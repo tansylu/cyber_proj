@@ -38,7 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id']) && isse
     $comment = trim($_POST['comment']);
 
     if (!empty($comment)) {
-        // Prepare and execute the insert query
+
+        /*
+        VULNERABILTIY:
+        All HTML tags and special characters are saved as they are in the databse. This exposes the web page to stored XSS if users key in html tags such as <script>.
+        */
         $insert_stmt = $conn->prepare("INSERT INTO article_comments (user_id, news_link, comment, created_at) VALUES (?, ?, ?, NOW())");
         if ($insert_stmt === false) {
             die("SQL Error: " . $conn->error);

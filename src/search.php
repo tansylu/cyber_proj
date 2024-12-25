@@ -6,7 +6,13 @@ $searchResults = [];
 $searchQuery = '';
 
 // Function to filter out <script> tags from the input
-function filter_script_tags($input) {
+function filter_script_tags($input)
+{
+
+    /*
+    VULNERABILITY:
+    This blacklist only filters <script>. This is insufficient as other HTML tags can be used to conduct stored XSS.
+    */
     // Remove <script> tags and their content
     $filtered_input = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $input);
     return $filtered_input;
@@ -31,10 +37,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['query'])) {
         if ($rss) {
             // Loop through each RSS item
             foreach ($rss->entry as $item) {
-                $title = (string)$item->title; // News title
-                $link = (string)$item->link['href'] ?: (string)$item->id; // News link
+                $title = (string) $item->title; // News title
+                $link = (string) $item->link['href'] ?: (string) $item->id; // News link
                 $description = strip_tags($item->content); // Clean HTML from content
-                $pubDate = (string)$item->published; // Publication date
+                $pubDate = (string) $item->published; // Publication date
 
                 // Check if the title contains the search query (case-insensitive, partial match)
                 if (stripos($title, $searchQuery) !== false) {
@@ -219,7 +225,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['query'])) {
 
     <div class="search-container">
         <form method="GET" class="search-form">
-            <input type="text" name="query" placeholder="Search travel news..." value="<?php echo htmlspecialchars($searchQuery); ?>" required>
+            <input type="text" name="query" placeholder="Search travel news..."
+                value="<?php echo htmlspecialchars($searchQuery); ?>" required>
             <button type="submit">Search</button>
         </form>
     </div>
@@ -239,7 +246,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['query'])) {
                             <p><strong>Published:</strong> <?php echo date("d-m-Y H:i", strtotime($result['pubDate'])); ?></p>
                             <p><?php echo htmlspecialchars(mb_substr($result['description'], 0, 150)); ?>...</p>
                             <div>
-                                <a href="viewarticle.php?news_link=<?php echo urlencode($result['link']); ?>" style="color: #007BFF; text-decoration: none; font-weight: bold; padding: 5px 10px; border: 1px solid #007BFF; border-radius: 5px;">View article</a>
+                                <a href="viewarticle.php?news_link=<?php echo urlencode($result['link']); ?>"
+                                    style="color: #007BFF; text-decoration: none; font-weight: bold; padding: 5px 10px; border: 1px solid #007BFF; border-radius: 5px;">View
+                                    article</a>
                             </div>
                         </div>
                     <?php endforeach; ?>
