@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     profile_pic VARCHAR(255) DEFAULT NULL,
     age INT DEFAULT NULL,
-    gender ENUM('male', 'female', 'other') DEFAULT NULL
+    gender ENUM('male', 'female', 'other') DEFAULT NULL,
+    role ENUM('user', 'admin') NOT NULL DEFAULT 'user'
 );
 
 CREATE TABLE IF NOT EXISTS rss_items (

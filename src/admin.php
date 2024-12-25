@@ -33,7 +33,7 @@ if (isset($_POST['delete_user_id'])) {
 }
 
 // Fetch all users
-$users_stmt = $conn->prepare("SELECT id, username, profile_pic, age, gender, created_at FROM users ORDER BY created_at DESC");
+$users_stmt = $conn->prepare("SELECT id, username, profile_pic, age, gender, role, created_at FROM users ORDER BY created_at DESC");
 if ($users_stmt === false) {
     die("SQL Error: " . $conn->error);
 }
