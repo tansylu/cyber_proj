@@ -1,93 +1,54 @@
-Name: Stored XSS (CWE-79: Improper Neutralization of Input During Web Page
-Generation ('Cross-site Scripting') Type 2)  Category: A03:2021–Injection  Technical
-Explanation: Stored XSS occurs when user input is saved to a backend database and later
-served back to other users in a web page or application without proper sanitization
-or escaping.  The vulnerability arises because browsers interpret the injected
-scripts as part of the legitimate web page.  Attackers can leverage this to steal
-cookies, hijack user sessions, perform phishing attacks and many more.  For example,
-user input might be embedded directly within the HTML tags,  such as
-<script>${user_input}</script>.  Without encoding or escaping the input, any script tags injected by a  user
-will execute in the browser context of anyone viewing the page.  The root cause
-lies in a lack of server-side validation,  improper input sanitization, and failure
-to escape special characters like <, >, or " in user inputs.  The impact includes
-stealing sensitive user data like cookies and session tokens, defacement of websites, 
-or serving malicious content.  
+Name: Stored XSS (CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') Type 2)
 
-Exploit:  
+Category: A03:2021–Injection
 
-Name: CWE-692: Incomplete Denylist to
-Cross-Site Scripting  Category:  Technical Explanation: CWE-692, Incomplete Denylist to
-Cross-Site Scripting is flawed because it attempts to identify and block "bad" inputs but
-cannot account for every possible variation of an attack. Attackers often encode,
-obfuscate, or modify payloads to bypass these filters. For example, if a denylist blocks
-<script>, the attacker can use various techniques such as case insensitivity
-(<ScRiPt>alert('XSS')</ScRiPt>), or injecting scripts through attributes like onerror or onmouseover in HTML
-elements. The fundamental issue is that denylist approaches operate reactively, trying
-to address known patterns of malicious input rather than ensuring robust input
-validation and output encoding. Rather, an allowlist should be adopted, where only
-explicitly allowed input patterns are accepted. For example, input can be strictly
-constrained to alphanumeric characters, or limited to well-defined and validated HTML tags
-and attributes.  
+Technical Explanation: Stored XSS occurs when user input is saved to a backend database and later served back to other users in a web page or application without proper sanitization or escaping. The vulnerability arises because browsers interpret the injected scripts as part of the legitimate web page.  Attackers can leverage this to steal cookies, hijack user sessions, perform phishing attacks and many more.  For example, user input might be embedded directly within the HTML tags,  such as <script>${user_input}</script>. Without encoding or escaping the input, any script tags injected by a  user will execute in the browser context of anyone viewing the page.  The root cause lies in a lack of server-side validation,  improper input sanitization, and failure to escape special characters like <, >, or " in user inputs.  The impact includes stealing sensitive user data like cookies and session tokens, defacement of websites, or serving malicious content.  
 
-Exploit:  
-
-Name: CWE-862: Missing Authorization  Category:
-A01:2021 – Broken Access Control  Technical Explanation: CWE-862, Missing Authorization
-arises when a web application does not implement proper access control mechanisms to
-verify whether a user is authorized to perform a specific action or access a
-resource. Authorization determines whether the user has the required permissions to
-access a resource or functionality. For example, an application might expose
-sensitive endpoints like admin settings without verifying the user's role or permission.
-This creates a vulnerability where an authenticated user, or even an
-unauthenticated user, can directly access the endpoints. The impact of this vulnerability
-ranges from unauthorized data access to privilege escalation, where attackers gain
-administrative or other sensitive capabilities within the application.  
-
-Exploit:  
-
-Name:
-Server-Side Request Forgery with blacklist-based input filter  Category: A10:2021 -
-Server-Side Request Forgery  Technical Explanation: Server-Side Request Forgery (SSRF)
-with a blacklist-based input filter is a vulnerability where an attacker can
-manipulate the application into sending unauthorized requests to internal or external
-systems. In a blacklist-based filter, certain inputs, such as "127.0.0.1" or "/admin"
-are explicitly denied. However, attackers can bypass these restrictions using
-alternate representations of the blocked addresses. For example, an attacker might use
-the hexadecimal representation of 127.0.0.1, or the URL encoding of /admin. SSRF
-occurs when the application uses user-provided URLs to fetch resources, often without
-validating the destination. This allows attackers to probe internal networks, access
-sensitive services, or exploit insecure APIs. The fundamental issue lies in the reliance
-on a denylist to block malicious input, which is inherently incomplete and fails
-to prevent all possible bypass techniques. Rather, an allowlist should be
-utilized instead where only explicitly allowed input patterns are accepted.  
-
-Exploit: 
+Exploit: By posting <script>alert('You have been hacked!')</script> as a comment, users that load the article page where the comment is supposed to be displayed will render this script and receive the pop up. This is because the payload is stored in the comments database for this article and will affect every user that attempts to load the article's page.
 
 
-Name: CWE-434 Unrestricted Upload of File with Dangerous Type  Category: A04:2021 –
-Insecure Design  Technical Explanation: CWE-434, unrestricted upload of a file with a
-dangerous type, occurs when a web application allows users to upload files without
-properly validating the file type or content. Once uploaded, these files may be
-executed on the server, leading to remote code execution or other attacks. This
-vulnerability often arises because file validation mechanisms rely on superficial checks,
-such as file extension or MIME type, which are easily manipulated by attackers. The
-root cause is the lack of robust server-side validation to ensure uploaded files
-meet strict criteria, such as checking their actual content or ensuring they cannot
-be executed.  
+Name: CWE-692: Incomplete Denylist to Cross-Site Scripting 
+ 
+Category:  A03:2021–Injection
 
-Exploit:  
+Technical Explanation: CWE-692, Incomplete Denylist to Cross-Site Scripting is flawed because it attempts to identify and block "bad" inputs but cannot account for every possible variation of an attack. Attackers often encode, obfuscate, or modify payloads to bypass these filters. For example, if a denylist blocks <script>, the attacker can use various techniques such as case insensitivity (<ScRiPt>alert('XSS')</ScRiPt>), or injecting scripts through attributes like onerror or onmouseover in HTML elements. The fundamental issue is that denylist approaches operate reactively, trying to address known patterns of malicious input rather than ensuring robust input
+validation and output encoding. Rather, an allowlist should be adopted, where only explicitly allowed input patterns are accepted. For example, input can be strictly constrained to alphanumeric characters, or limited to well-defined and validated HTML tags and attributes.  
+
+
+Exploit: Search function allows users to search for news. While it filters out tags such as <script>, the denylist fails to prevent all possible tags. This results in a malicious script being saved to the search database that will be visible in the admin panel that displays a list of recent searches. Upon loading, the script will execute. 
+
+
+Name: CWE-862: Missing Authorization  
+
+Category: A01:2021 – Broken Access Control  
+
+Technical Explanation: CWE-862, Missing Authorization arises when a web application does not implement proper access control mechanisms to verify whether a user is authorized to perform a specific action or access a resource. Authorization determines whether the user has the required permissions to access a resource or functionality. For example, an application might expose sensitive endpoints like admin settings without verifying the user's role or permission. This creates a vulnerability where an authenticated user, or even an unauthenticated user, can directly access the endpoints. The impact of this vulnerability ranges from unauthorized data access to privilege escalation, where attackers gain administrative or other sensitive capabilities within the application.  
+
+Exploit: Without proper access controls on the admin.php page, any user, regardless of their role, will be able to access this panel and perform admin-only actions such as deleting users and comments.
+
+
+Name: Server-Side Request Forgery with Blacklist-Based Input Filter  
+
+Category: A10:2021 - Server-Side Request Forgery  
+
+Technical Explanation: Server-Side Request Forgery (SSRF) with a blacklist-based input filter is a vulnerability where an attacker can manipulate the application into sending unauthorized requests to internal or external systems. In a blacklist-based filter, certain inputs, such as "localhost" or "/admin" are explicitly denied. However, attackers can bypass these restrictions using alternate representations of the blocked addresses. For example, an attacker might use the hexadecimal representation of 127.0.0.1, or the URL encoding of /admin. SSRF occurs when the application uses user-provided URLs to fetch resources, often without validating the destination. This allows attackers to probe internal networks, access sensitive services, or exploit insecure APIs. The fundamental issue lies in the reliance on a denylist to block malicious input, which is inherently incomplete and fails to prevent all possible bypass techniques. Rather, an allowlist should be utilized instead where only explicitly allowed input patterns are accepted.  
+
+Exploit: Using BurpSuite, the POST request can be intercepted and sent to the repeater. Thereafter, the news_link can be altered to the loopback address to access sensitive resources such as an admin panel. While some hostnames like "localhost" are filtered by the blacklist on our website, the blacklist fails to prevent "127.0.0.1" and hence, allows the attacker to use it to access the admin panel.
+
+
+Name: CWE-434 Unrestricted Upload of File with Dangerous Type 
+ 
+Category: A04:2021 – Insecure Design
+
+Technical Explanation: CWE-434, unrestricted upload of a file with a dangerous type, occurs when a web application allows users to upload files without properly validating the file type or content. Once uploaded, these files may be executed on the server, leading to remote code execution or other attacks. This vulnerability often arises because file validation mechanisms rely on superficial checks, such as file extension or MIME type, which are easily manipulated by attackers. The root cause is the lack of robust server-side validation to ensure uploaded files meet strict criteria, such as checking their actual content or ensuring they cannot be executed.  
+
+Exploit: Without checking the file type, any file with any extension will be able to be uploaded. A file containing the php code echo exec($_GET[‘cmd’]) when uploaded will allow attackers to access it and perform shell commands, for example ls to display all the files present. Attackers will have access to the internal files and perform malicious shell commands.
 
 
 Name: CWE-312: Cleartext Storage of Sensitive Information
- Category: A04:2021 – Insecure Design  Technical Explanation: CWE-312,
-cleartext storage of sensitive information, occurs when an application stores sensitive
-data such as passwords, tokens, or cryptographic keys in plaintext. This
-vulnerability arises from a failure to use encryption or hashing mechanisms to protect
-sensitive data at rest. For instance, passwords stored directly in a database without
-hashing allow attackers to immediately use the stolen credentials if the database is
-compromised. The fundamental issue is the absence of data protection mechanisms, such as
-using strong cryptographic algorithms or ensuring that sensitive data is only
-accessible to authorized systems and users. The impact of this vulnerability is severe,
-as it can lead to data breaches and unauthorized access.  
 
-Exploit: 
+Category: A04:2021 – Insecure Design  
+
+Technical Explanation: CWE-312, cleartext storage of sensitive information, occurs when an application stores sensitive data such as passwords, tokens, or cryptographic keys in plaintext. This vulnerability arises from a failure to use encryption or hashing mechanisms to protect sensitive data at rest. For instance, passwords stored directly in a database without hashing allow attackers to immediately use the stolen credentials if the database is compromised. The fundamental issue is the absence of data protection mechanisms, such as using strong cryptographic algorithms or ensuring that sensitive data is only accessible to authorized systems and users. The impact of this vulnerability is severe, as it can lead to data breaches and unauthorized access.  
+
+Exploit: The database stores passwords in cleartext. Any attack that dumps the sql users table will reveal all the passwords of users in cleartext.
