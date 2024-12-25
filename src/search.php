@@ -5,10 +5,20 @@ include 'database.php'; // Include database connection
 $searchResults = [];
 $searchQuery = '';
 
+// Function to filter out <script> tags from the input
+function filter_script_tags($input) {
+    // Remove <script> tags and their content
+    $filtered_input = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $input);
+    return $filtered_input;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['query'])) {
     $searchQuery = trim($_GET['query']); // Get the search query and remove extra spaces
 
     if (!empty($searchQuery)) {
+        // Apply filter to remove <script> tags
+        $searchQuery = filter_script_tags($searchQuery);
+
         // Insert the search query into the search_queries table
         $stmt = $conn->prepare("INSERT INTO search_queries (query) VALUES (?)");
         $stmt->bind_param("s", $searchQuery);
