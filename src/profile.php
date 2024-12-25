@@ -44,25 +44,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_pic'])) {
     $uploadDir = 'uploads/'; // Directory for uploaded files
     $uploadFile = $uploadDir . basename($_FILES['profile_pic']['name']);
     $fileType = strtolower(pathinfo($uploadFile, PATHINFO_EXTENSION)); // Get file extension
-
-    /*
-    PATCHED:
-    A whitelist is defined for allowed filetypes to prevent unrestricted upload of file with dangerous type
-    */
-
-    $allowedTypes = ['jpg', 'jpeg', 'png', 'gif']; // Allowed file types
-
     if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true)) {
         die("Failed to create directory: " . error_get_last()['message']);
     }
 
+    /*
+    VULNERABILTIY:
+    File types or content are not properly validated. As such, users can upload a malicious file in the profile picture field that may execute on the server, leading
+    to unrestricted upload of file with dangerous type vulnerability.
+    */
 
-
-
-    // File validation
-    if (!in_array($fileType, $allowedTypes)) {
-        echo "<p style='color:red;'>Error: Only JPG, JPEG, PNG, and GIF files are allowed.</p>";
-    } elseif ($_FILES['profile_pic']['size'] > 2 * 1024 * 1024) { // Limit file size to 2MB
+    if ($_FILES['profile_pic']['size'] > 2 * 1024 * 1024) { // Limit file size to 2MB
         echo "<p style='color:red;'>Error: File size exceeds 2MB limit.</p>";
     } else {
         // Rename the file to avoid overwrites
