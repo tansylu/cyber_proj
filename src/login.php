@@ -1,20 +1,10 @@
 <?php
-session_start();
-require($_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php');
-$dotenv = Dotenv\Dotenv::createImmutable($_SERVER['DOCUMENT_ROOT'] . '/../');
-$dotenv->load();
-
-$servername = $_SERVER['DB_SERVERNAME'] ?? 'default_servername';
-$username = $_SERVER['DB_USERNAME'] ?? 'default_username';
-$password = $_SERVER['DB_PASSWORD'] ?? 'default_password';
-$dbname = $_SERVER['DB_NAME'] ?? 'default_dbname';
-
-$conn = new mysqli($servername, $username, $password, $dbname);
+include 'database.php'; // Include database connection
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
+session_start();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -27,17 +17,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($stmt->num_rows > 0) {
         $stmt->bind_result($id, $db_username, $db_password);
         $stmt->fetch();
-
-        if (password_verify($password, $db_password)) {
+        if($password ==$db_password) {
             $_SESSION['user_id'] = $id;
             $_SESSION['username'] = $db_username;
+            
             header("Location: profile.php");
             exit();
         } else {
-            $error = "Invalid username or password.";
+            $error = "Invalid username or password";
         }
     } else {
-        $error = "Invalid username or password.";
+        $error = "Invalid username or password";
     }
 
     $stmt->close();

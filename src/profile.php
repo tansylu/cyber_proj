@@ -57,16 +57,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_pic'])) {
     if ($_FILES['profile_pic']['size'] > 2 * 1024 * 1024) { // Limit file size to 2MB
         echo "<p style='color:red;'>Error: File size exceeds 2MB limit.</p>";
     } else {
-        // Rename the file to avoid overwrites
-        $uniqueName = $uploadDir . uniqid('profile_', true) . '.' . $fileType;
+        // // Rename the file to avoid overwrites
+        // $uploadFile = $uploadDir . uniqid('profile_', true) . '.' . $fileType;
 
-        if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $uniqueName)) {
+        if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $uploadFile)) {
             // Update the database with the new file path
             $stmt = $conn->prepare("UPDATE users SET profile_pic = ? WHERE id = ?");
-            $stmt->bind_param("si", $uniqueName, $user_id);
+            $stmt->bind_param("si", $uploadFile, $user_id);
             if ($stmt->execute()) {
                 echo "<p style='color:green;'>Profile picture uploaded successfully!</p>";
-                $db_profile_pic = $uniqueName; // Update for immediate display
+                $db_profile_pic = $uploadFile; // Update for immediate display
             } else {
                 echo "<p style='color:red;'>Error updating profile picture in the database.</p>";
             }

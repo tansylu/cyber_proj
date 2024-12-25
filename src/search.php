@@ -10,18 +10,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['query'])) {
     $searchQuery = trim($_GET['query']); // Get the search query and remove extra spaces
 
     if (!empty($searchQuery)) {
-        // SQL Query to search for the title containing the search word
-        $stmt = $conn->prepare("SELECT title, link, description, pubDate FROM rss_items WHERE title LIKE ?");
-        $searchTerm = '%' . $searchQuery . '%';
-        $stmt->bind_param("s", $searchTerm);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        while ($row = $result->fetch_assoc()) {
-            $searchResults[] = $row;
+        // Fetch the RSS feed and parse it
+        $rssUrl = "https://www.ntv.com.tr/seyahat.rss";
+        $rss = simplexml_load_file($rssUrl);
+        if ($rss) {
+            // Loop through each RSS item and check if the title contains the search term (case-insensitive, partial match)
+            foreach ($rss->entry as $item) {
+                echo($item);
+                $title = $item->title; 
+                if (stripos($title, $searchQuery) !== false) {
+                    $searchResults[] = [
+                        'title' => $title,
+                        'link' => (string)$item->link,
+                        'description' => (string)$item->description,
+                        'pubDate' => (string)$item->pubDate,
+                    ];
+                }
+            }
         }
-
-        $stmt->close();
     }
 }
 ?>
@@ -32,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['query'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Travel Advisories</title>
+    <title>Search Travel News</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -190,7 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['query'])) {
     <!-- Search Form -->
     <div class="search-container">
         <form method="GET" class="search-form">
-            <input type="text" name="query" placeholder="Search advisories..." required>
+            <input type="text" name="query" placeholder="Search travel news..." value="<?php echo htmlspecialchars($searchQuery); ?>" required>
             <button type="submit">Search</button>
         </form>
     </div>
@@ -204,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['query'])) {
                     <?php foreach ($searchResults as $result): ?>
                         <div class="result-item">
                             <h3>
-                                <a href="viewarticle.php?news_link=<?php echo urlencode($result['link']); ?>">
+                                <a href="<?php echo htmlspecialchars($result['link']); ?>" target="_blank">
                                     <?php echo htmlspecialchars($result['title']); ?>
                                 </a>
                             </h3>

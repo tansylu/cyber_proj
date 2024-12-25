@@ -29,5 +29,6 @@ COPY .env /var/www/
 # List the files to verify installation (optional, remove in production)
 RUN cat /var/www/.env
 
+
 # Expose the default Apache port
 EXPOSE 80

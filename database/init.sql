@@ -1,8 +1,9 @@
+-- Create the database if it does not exist
 CREATE DATABASE IF NOT EXISTS travel_advisory;
 
 USE travel_advisory;
 
-
+-- Create users table
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
@@ -14,15 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
     role ENUM('user', 'admin') NOT NULL DEFAULT 'user'
 );
 
-CREATE TABLE IF NOT EXISTS rss_items (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    link TEXT NOT NULL,
-    description TEXT,
-    pubDate DATETIME,
-    UNIQUE (title)
-);
-
+-- Create comments table
 CREATE TABLE IF NOT EXISTS comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -31,13 +24,20 @@ CREATE TABLE IF NOT EXISTS comments (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+-- Create article_comments table
 CREATE TABLE IF NOT EXISTS article_comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    news_link TEXT NOT NULL,         -- Haber linki
-    user_id INT NOT NULL,            -- Kullanıcı ID'si
-    comment TEXT NOT NULL,           -- Yorum içeriği
+    news_link TEXT NOT NULL,         -- News link
+    user_id INT NOT NULL,            -- User ID
+    comment TEXT NOT NULL,           -- Comment content
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS search_queries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    query VARCHAR(255) NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 

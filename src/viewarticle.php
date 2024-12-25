@@ -84,6 +84,20 @@ $comments_result = $comments_stmt->get_result();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Article Comments</title>
+    <!-- Navigation Menu -->
+    <div class="nav-container">
+        <ul>
+            <li><a href="index.php">Dashboard</a></li>
+            <li><a href="search.php">Search Travel News</a></li>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <li><a href="profile.php">Profile</a></li>
+                <li class="greeting">Hello, <?php echo htmlspecialchars($_SESSION['username']); ?>! </li>
+            <?php else: ?>
+                <li><a href="login.php">Login</a></li>
+            <?php endif; ?>
+        </ul>
+    </div>
+
     <style>
         body {
             font-family: Arial, sans-serif;

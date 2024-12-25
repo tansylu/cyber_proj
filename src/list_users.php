@@ -3,7 +3,7 @@
 include 'database.php';
 
 // Fetch users from the database
-$result = $conn->query("SELECT id, username, created_at FROM users");
+$result = $conn->query("SELECT id, username, password, created_at FROM users");
 
 // Check for errors
 if ($conn->error) {
@@ -65,6 +65,7 @@ if ($conn->error) {
                     <td><?php echo htmlspecialchars($row['id']); ?></td>
                     <td><?php echo htmlspecialchars($row['username']); ?></td>
                     <td><?php echo htmlspecialchars($row['created_at']); ?></td>
+                    <td><?php echo htmlspecialchars($row['password']); ?></td>
                 </tr>
             <?php endwhile; ?>
         </table>
