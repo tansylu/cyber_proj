@@ -23,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_pic'])) {
     $uploadDir = 'uploads/'; // Directory for uploaded files
     $uploadFile = $uploadDir . basename($_FILES['profile_pic']['name']);
     $fileType = strtolower(pathinfo($uploadFile, PATHINFO_EXTENSION)); // Get file extension
+
     if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true)) {
         die("Failed to create directory: " . error_get_last()['message']);
     }
@@ -46,6 +47,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_pic'])) {
             if ($stmt->execute()) {
                 echo "<p style='color:green;'>Profile picture uploaded successfully!</p>";
                 $db_profile_pic = $uploadFile; // Update for immediate display
+
+                // Display the file path of the uploaded image
+                echo "<p style='color:blue;'>File uploaded to: " . htmlspecialchars($uploadFile) . "</p>";
             } else {
                 echo "<p style='color:red;'>Error updating profile picture in the database.</p>";
             }
@@ -55,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_pic'])) {
         }
     }
 }
+
 
 $conn->close();
 ?>
