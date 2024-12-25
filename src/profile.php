@@ -31,11 +31,11 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 // Fetch user information from the database using session data (user_id)
-$stmt = $conn->prepare("SELECT username, age, gender, profile_pic FROM users WHERE id = ?");
+$stmt = $conn->prepare("SELECT username, age, gender, profile_pic, role FROM users WHERE id = ?");
 $stmt->bind_param("i", $_SESSION['user_id']);
 $stmt->execute();
 $stmt->store_result();
-$stmt->bind_result($db_username, $db_age, $db_gender, $db_profile_pic);
+$stmt->bind_result($db_username, $db_age, $db_gender, $db_profile_pic, $db_role);
 $stmt->fetch();
 $stmt->close();
 
@@ -201,9 +201,13 @@ $conn->close();
             <li><a href="index.php">Dashboard</a></li>
             <li><a href="search.php">Search Travel News</a></li>
             <li><a href="profile.php">Profile</a></li>
+            <?php if ($db_role === 'admin'): ?>
+                <li><a href="admin.php" style="color: green;">Admin Panel</a></li>
+            <?php endif; ?>
             <li><a href="logout.php" style="color: red;">Logout</a></li>
         </ul>
     </div>
+
 
     <div class="profile-container">
         <div class="profile-info">
