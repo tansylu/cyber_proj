@@ -11,10 +11,10 @@ if ($_SERVER['REMOTE_ADDR'] === '127.0.0.1') {
 PATCHED:
 Check if user is an admin. If not, do not allow user to acces admin panel.
 */
-if (!isset($_SESSION['user_id']) || (isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') || !isset($_SESSION['role'])) {
-    echo '<script>alert("Access denied. You must be an admin to view this page."); window.location.href = "index.php";</script>';
-    exit();
-}
+// if (!isset($_SESSION['user_id']) || (isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') || !isset($_SESSION['role'])) {
+//     echo '<script>alert("Access denied. You must be an admin to view this page."); window.location.href = "index.php";</script>';
+//     exit();
+// }
 
 // Handle User Deletion
 if (isset($_POST['delete_user_id'])) {
