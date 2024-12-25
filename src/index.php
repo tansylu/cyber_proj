@@ -187,10 +187,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
                 <li><a href="admin.php">Admin Panel</a></li>
                 <li><a href="add_admin.php">Add Admin</a></li>
                 <li><a href="profile.php">Profile</a></li>
+                <li><a href="logout.php" style="color: red;">Logout</a></li>
             <?php else: ?>
                 <li><a href="login.php">Login</a></li>
             <?php endif; ?>
-            <li><a href="logout.php" style="color: red;">Logout</a></li>
         </ul>
     </div>
 
@@ -207,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
                 $link = (string) $item->link['href'] ?: (string) $item->id;
                 $content = strip_tags($item->content); // İçerik (HTML temizlenmiş)
                 $published = date("d-m-Y H:i", strtotime($item->published)); // Yayınlanma tarihi
-
+            
                 // Haber kutusunu ekrana yazdır
                 echo '<div class="news-item">';
                 echo '<h3>' . htmlspecialchars($title) . '</h3>';
