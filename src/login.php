@@ -132,7 +132,6 @@ $conn->close();
             <button type="submit">Login</button>
         </form>
         <div class="link-container">
-            <a href="admin_login.php">Admin Login</a>
             <a href="create_account.php">Create Account</a>
         </div>
     </div>

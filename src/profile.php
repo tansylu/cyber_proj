@@ -201,6 +201,8 @@ $conn->close();
             <li><a href="index.php">Dashboard</a></li>
             <li><a href="search.php">Search Travel News</a></li>
             <li><a href="profile.php">Profile</a></li>
+
+            <!-- PATCHED: verify user role before displaying admin panel -->
             <?php if ($db_role === 'admin'): ?>
                 <li><a href="admin.php" style="color: green;">Admin Panel</a></li>
             <?php endif; ?>
