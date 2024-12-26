@@ -64,9 +64,84 @@ $conn->close();
 <!DOCTYPE html>
 <html>
 
+<!DOCTYPE html>
+<html>
+
 <head>
     <style>
-        /* Styles omitted for brevity */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 20px;
+        }
+
+        .create-account-container {
+            max-width: 400px;
+            margin: 50px auto;
+            text-align: center;
+        }
+
+        .create-account-form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .create-account-form input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .create-account-form select {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .create-account-form button {
+            width: 100%;
+            padding: 10px;
+            background-color: blue;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .create-account-form button:hover {
+            background-color: #007BFF;
+        }
+
+        .link-container {
+            margin-top: 10px;
+        }
+
+        .link-container a {
+            display: inline-block;
+            text-decoration: none;
+            color: blue;
+            font-weight: bold;
+            margin-right: 10px;
+            margin-left: 10px;
+            margin-bottom: 5px;
+        }
+
+        .link-container a:hover {
+            color: darkblue;
+        }
+
+        .error {
+            color: red;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 
