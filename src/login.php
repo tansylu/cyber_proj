@@ -4,23 +4,36 @@ include 'database.php'; // Include database connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-session_start();
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
 
-    $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username = ?");
+session_start();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
+
+    // Update the query to include the role column
+    $stmt = $conn->prepare("SELECT id, username, password, role FROM users WHERE username = ?");
+    if ($stmt === false) {
+        die("SQL Error: " . $conn->error);
+    }
+
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $stmt->store_result();
 
     if ($stmt->num_rows > 0) {
-        $stmt->bind_result($id, $db_username, $db_password);
+        // Bind result variables
+        $stmt->bind_result($id, $db_username, $db_password, $db_role);
         $stmt->fetch();
+
+        // Verify the password
         if (password_verify($password, $db_password)) {
+            // Set session variables
             $_SESSION['user_id'] = $id;
             $_SESSION['username'] = $db_username;
             $_SESSION['role'] = $db_role;
+
+            // Redirect to profile page
             header("Location: profile.php");
             exit();
         } else {
@@ -35,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $conn->close();
 ?>
+
 
 <!DOCTYPE html>
 <html>

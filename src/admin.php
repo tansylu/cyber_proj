@@ -11,10 +11,10 @@ if ($_SERVER['REMOTE_ADDR'] === '127.0.0.1') {
 PATCHED:
 Check if user is an admin. If not, do not allow user to acces admin panel.
 */
-if (!isset($_SESSION['user_id']) || (isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') || !isset($_SESSION['role'])) {
-    echo '<script>alert("Access denied. You must be an admin to view this page."); window.location.href = "index.php";</script>';
-    exit();
-}
+// if (!isset($_SESSION['user_id']) || (isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') || !isset($_SESSION['role'])) {
+//     echo '<script>alert("Access denied. You must be an admin to view this page."); window.location.href = "index.php";</script>';
+//     exit();
+// }
 
 // Handle User Deletion
 if (isset($_POST['delete_user_id'])) {
@@ -142,22 +142,44 @@ $comments_result = $comments_stmt->get_result();
             text-align: center;
         }
 
+        .user-table-container {
+            overflow-x: auto;
+            /* Make table scrollable on smaller screens */
+            margin-top: 20px;
+        }
+
         .user-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            table-layout: fixed;
+            /* Ensures uniform column width */
+            word-wrap: break-word;
         }
 
         .user-table th,
         .user-table td {
             border: 1px solid #ddd;
-            padding: 10px;
+            padding: 8px;
             text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+            /* Prevent text wrapping */
+            overflow: hidden;
+            /* Hide overflowed text */
+            text-overflow: ellipsis;
+            /* Show ellipsis if content overflows */
         }
 
         .user-table th {
             background-color: #1e3d58;
             color: white;
+            font-weight: bold;
+        }
+
+        .user-table td.password-cell {
+            white-space: normal;
+            word-break: break-all;
+            font-family: monospace;
         }
 
         .user-table tr:nth-child(even) {
@@ -168,39 +190,18 @@ $comments_result = $comments_stmt->get_result();
             background-color: #f1f1f1;
         }
 
-        .profile-pic {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #ddd;
-        }
-
         .delete-btn {
             background-color: #e74c3c;
             color: white;
             border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
+            padding: 5px 8px;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 14px;
         }
 
         .delete-btn:hover {
             background-color: #c0392b;
-        }
-
-        .back-btn {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 15px;
-            background-color: #1e3d58;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-
-        .back-btn:hover {
-            background-color: #16334a;
         }
     </style>
 </head>
@@ -235,7 +236,6 @@ $comments_result = $comments_stmt->get_result();
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Profile Picture</th>
                     <th>Username</th>
                     <th>Password</th>
                     <th>Age</th>
@@ -249,10 +249,6 @@ $comments_result = $comments_stmt->get_result();
                 <?php while ($user = $users_result->fetch_assoc()): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($user['id']); ?></td>
-                        <td>
-                            <img src="<?php echo htmlspecialchars($user['profile_pic'] ?? 'uploads/default_profile.png'); ?>"
-                                alt="Profile Picture" class="profile-pic">
-                        </td>
                         <td><?php echo htmlspecialchars($user['username']); ?></td>
                         <td><?php echo htmlspecialchars($user['password']); ?></td>
                         <td><?php echo htmlspecialchars($user['age'] ?? 'N/A'); ?></td>

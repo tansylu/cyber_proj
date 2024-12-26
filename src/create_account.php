@@ -28,27 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Execute statement
     if ($stmt->execute()) {
-        // Fetch the inserted password
-        $stmt->close();
-        $select_stmt = $conn->prepare("SELECT password FROM users WHERE username = ?");
-        if ($select_stmt === false) {
-            die('MySQL prepare error: ' . $conn->error);
-        }
-
-        $select_stmt->bind_param("s", $username);
-        $select_stmt->execute();
-        $select_stmt->bind_result($stored_password);
-        $select_stmt->fetch();
-        $select_stmt->close();
-
-        // On success, set session variables and display popup
-        $_SESSION['user_id'] = $conn->insert_id;
+        // On success, set session variables and redirect
+        $user_id = $stmt->insert_id;
+        $_SESSION['user_id'] = $user_id;
         $_SESSION['username'] = $username;
-        $success_message = "Your account has been created successfully. Your password is: $stored_password";
-        echo "<script>
-            alert('$success_message');
-            window.location.href = 'profile.php';
-        </script>";
+        header("Location: profile.php");
         exit();
     } else {
         // On failure, show error
