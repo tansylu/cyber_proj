@@ -7,10 +7,10 @@ PATCHED:
 Validation is done to ensure only admins can access this page.
 */
 // Check if the user is an admin
-// if (!isset($_SESSION['user_id']) || (isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') || !isset($_SESSION['role'])) {
-//     echo '<script>alert("Access denied. You must be an admin to view this page."); window.location.href = "index.php";</script>';
-//     exit();
-// }
+if (!isset($_SESSION['user_id']) || (isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') || !isset($_SESSION['role'])) {
+    echo '<script>alert("Access denied. You must be an admin to view this page."); window.location.href = "index.php";</script>';
+    exit();
+}
 
 $error = '';
 $success = '';
