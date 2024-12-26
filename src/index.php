@@ -190,10 +190,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_link'])) {
                 <li><a href="admin.php">Admin Panel</a></li>
                 <li><a href="add_admin.php">Add Admin</a></li>
                 <li><a href="profile.php">Profile</a></li>
+                <li><a href="logout.php" style="color: red;">Logout</a></li>
             <?php else: ?>
                 <li><a href="login.php">Login</a></li>
             <?php endif; ?>
-            <li><a href="logout.php" style="color: red;">Logout</a></li>
         </ul>
     </div>
 

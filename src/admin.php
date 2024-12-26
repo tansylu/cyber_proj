@@ -11,10 +11,10 @@ if ($_SERVER['REMOTE_ADDR'] === '127.0.0.1') {
 PATCHED:
 Check if user is an admin. If not, do not allow user to acces admin panel.
 */
-// if (!isset($_SESSION['user_id']) || (isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') || !isset($_SESSION['role'])) {
-//     echo '<script>alert("Access denied. You must be an admin to view this page."); window.location.href = "index.php";</script>';
-//     exit();
-// }
+if (!isset($_SESSION['user_id']) || (isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') || !isset($_SESSION['role'])) {
+    echo '<script>alert("Access denied. You must be an admin to view this page."); window.location.href = "index.php";</script>';
+    exit();
+}
 
 // Handle User Deletion
 if (isset($_POST['delete_user_id'])) {
@@ -222,10 +222,10 @@ $comments_result = $comments_stmt->get_result();
                 <li><a href="admin.php">Admin Panel</a></li>
                 <li><a href="add_admin.php">Add Admin</a></li>
                 <li><a href="profile.php">Profile</a></li>
+                <li><a href="logout.php" style="color: red;">Logout</a></li>
             <?php else: ?>
                 <li><a href="login.php">Login</a></li>
             <?php endif; ?>
-            <li><a href="logout.php" style="color: red;">Logout</a></li>
         </ul>
     </div>
 
